@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>36 Questions</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="hearts-bg"></div>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="start-screen">
+    <h1>36 Questions</h1>
+    <p class="subtitle">Enter player names to begin</p>
+
+    <input id="playerAInput" type="text" placeholder="Player A name" autocomplete="off" />
+    <input id="playerBInput" type="text" placeholder="Player B name" autocomplete="off" />
+
+    <button id="startGame" class="btn btn-primary">Start Game</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="app hidden">
+    <h1>36 Questions</h1>
+
+    <div class="meta">
+      <span id="set"></span>
+      <span id="progress"></span>
+      <span id="player"></span>
+    </div>
+
+    <div class="card">
+      <p id="question"></p>
+    </div>
+
+    <textarea id="note" placeholder="Optional notes..."></textarea>
+
+    <!-- Main navigation -->
+    <div class="controls">
+      <button id="prev" class="btn btn-secondary">Previous</button>
+      <button id="next" class="btn btn-primary">Next</button>
+      <button id="reset" class="btn btn-ghost">Reset</button>
+    </div>
+
+    <!-- Multiplayer / Share -->
+    <div class="controls">
+      <button id="share" class="btn btn-secondary">Share Session</button>
+      <button id="copyLink" class="btn btn-secondary">Copy Link</button>
+    </div>
+
+    <p id="shareInfo" class="share-info"></p>
+  </div>
+
+  <!-- Scripts (non-module) -->
+  <script src="js/questions.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+/* ================================
+   Pink on Black – Couple Game Theme
+   ================================ */
+
+:root {
+  --bg-main: #000000;
+
+  --pink-1: #fbcfe8; /* very light pink (text highlights) */
+  --pink-2: #f472b6; /* primary pink */
+  --pink-3: #ec4899; /* strong pink */
+  --pink-4: #be185d; /* dark pink */
+
+  --card-bg: #050505;
+  --border: #2a0e1f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, sans-serif;
+  background: var(--bg-main);
+  color: var(--pink-1);
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Make content sit above background */
+.start-screen,
+.app {
+  position: relative;
+  z-index: 2;
+}
+
+/* ================================
+   Layout
+   ================================ */
+
+.app {
+  max-width: 600px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  color: var(--pink-2);
+  letter-spacing: 0.05em;
+}
+
+/* ================================
+   Meta info
+   ================================ */
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-top: 10px;
+  color: var(--pink-1);
+}
+
+/* ================================
+   Question card
+   ================================ */
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 26px;
+  border-radius: 16px;
+  margin: 22px 0;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--pink-1);
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.08),
+    0 10px 30px rgba(236, 72, 153, 0.15);
+}
+
+/* ================================
+   Notes
+   ================================ */
+
+textarea {
+  width: 100%;
+  height: 90px;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  background: #020202;
+  color: var(--pink-1);
+  margin-bottom: 18px;
+  resize: vertical;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: rgba(236, 72, 153, 0.7);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+}
+
+textarea::placeholder {
+  color: var(--pink-4);
+}
+
+/* ================================
+   Controls (ALL buttons same style)
+   ================================ */
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+button {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  cursor: pointer;
+
+  background: linear-gradient(180deg, rgba(236, 72, 153, 0.95), rgba(190, 24, 93, 0.95));
+  color: #ffffff;
+
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease,
+    opacity 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(236, 72, 153, 0.28);
+  filter: brightness(1.05);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.18);
+  filter: brightness(0.98);
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(236, 72, 153, 0.22),
+    0 10px 28px rgba(236, 72, 153, 0.20);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ================================
+   Start Screen
+   ================================ */
+
+.start-screen {
+  max-width: 420px;
+  width: 100%;
+  background: #050505;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(236, 72, 153, 0.25);
+}
+
+.start-screen h1 {
+  color: var(--pink-2);
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: var(--pink-4);
+  margin-bottom: 24px;
+}
+
+.start-screen input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #020202;
+  color: var(--pink-1);
+  font-size: 1rem;
+  outline: none;
+}
+
+.start-screen input:focus {
+  border-color: rgba(236, 72, 153, 0.7);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+}
+
+.start-screen input::placeholder {
+  color: var(--pink-4);
+}
+
+.start-screen button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ================================
+   Share info
+   ================================ */
+
+.share-info {
+  margin-top: 10px;
+  color: var(--pink-4);
+  font-size: 0.95rem;
+  line-height: 1.3;
+  min-height: 1.2em;
+}
+
+/* ================================
+   Utility
+   ================================ */
+
+.hidden { display: none; }
+
+/* Mobile friendly: stack controls */
+@media (max-width: 540px) {
+  body { padding: 20px; }
+  .controls {
+    flex-direction: column;
+  }
+  button {
+    width: 100%;
+  }
+}
+
+/* ================================
+   Floating Hearts Background
+   ================================ */
+
+#hearts-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1; /* behind content, but visible */
+}
+
+.heart {
+  position: absolute;
+  background-image: url("../hand-drawn-heart-1.png"); /* ✅ relative path from css/ */
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.12;
+  filter: brightness(0.75);
+  transform: rotate(var(--rot, 0deg));
+}

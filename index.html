@@ -26,7 +26,23 @@
 
     <div class="meta">
       <span id="set"></span>
-      <span id="progress"></span>
+      <span id="set"></span>
+
+      <div class="progress-wrap" aria-label="Game progress">
+      <div
+        class="progress-bar"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="36"
+        aria-valuenow="1"
+      >
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">Question 1 / 36</div>
+    </div>
+
+<span id="player"></span>
+
       <span id="player"></span>
     </div>
 
@@ -35,6 +51,31 @@
     </div>
 
     <textarea id="note" placeholder="Optional notes..."></textarea>
+
+    <div class="answered-wrap">
+      <div class="answered-head">
+        <h2 class="answered-title">Answered questions</h2>
+        <div class="answered-legend">
+          <span class="dot dot-a"></span> You
+          <span class="dot dot-b"></span> Partner
+        </div>
+      </div>
+
+      <div class="answered-table-wrap">
+        <table class="answered-table" id="answeredTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Set</th>
+              <th>Question</th>
+              <th class="col-small">You</th>
+              <th class="col-small">Her</th>
+            </tr>
+          </thead>
+          <tbody id="answeredTbody"></tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Main navigation -->
     <div class="controls">
@@ -48,6 +89,12 @@
       <button id="share" class="btn btn-secondary">Share Session</button>
       <button id="copyLink" class="btn btn-secondary">Copy Link</button>
     </div>
+
+    <div class="controls">
+      <input id="importLink" type="text" placeholder="Paste partner link here..." />
+      <button id="importBtn" class="btn btn-secondary">Import & Sync</button>
+    </div>
+
 
     <p id="shareInfo" class="share-info"></p>
   </div>

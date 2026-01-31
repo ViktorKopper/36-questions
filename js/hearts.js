@@ -1,32 +1,51 @@
-/* ================================
-   Background hearts generator
-   ================================ */
+const heartsBg = document.getElementById("hearts-bg");
 
-(function generateHearts() {
-  const container = document.getElementById("hearts-bg");
-  if (!container) return;
+const HEART_COUNT = 22; // viac, ale stale chill
 
-  const HEART_COUNT = 28; // uprav podľa chuti
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
 
-  for (let i = 0; i < HEART_COUNT; i++) {
-    const heart = document.createElement("div");
-    heart.className = "heart";
+  const size = rand(100, 280);
+  const left = rand(-10, 100);
+  const duration = rand(20, 45);
+  const rotation = rand(-30, 30);
+  const scale = rand(0.6, 1.2);
+  const opacity = rand(0.03, 0.12); // 👈 hlavne toto
 
-    const size = Math.random() * 120 + 40; // 40px – 160px
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
-    const opacity = Math.random() * 0.25 + 0.05;
-    const brightness = Math.random() * 0.6 + 0.5;
-    const rotation = Math.random() * 40 - 20;
+  heart.style.width = size + "px";
+  heart.style.height = size + "px";
+  heart.style.left = left + "vw";
+  heart.style.top = "110vh";
 
-    heart.style.width = `${size}px`;
-    heart.style.height = `${size}px`;
-    heart.style.left = `${x}%`;
-    heart.style.top = `${y}%`;
-    heart.style.opacity = opacity;
-    heart.style.filter = `brightness(${brightness})`;
-    heart.style.setProperty("--rot", `${rotation}deg`);
+  heart.style.setProperty("--rot", rotation + "deg");
+  heart.style.setProperty("--scale", scale);
+  heart.style.setProperty("--opacity", opacity);
 
-    container.appendChild(heart);
-  }
-})();
+  heart.animate(
+    [
+      {
+        transform: `translateY(0) rotate(${rotation}deg) scale(${scale})`
+      },
+      {
+        transform: `translateY(-140vh) rotate(${rotation}deg) scale(${scale})`
+      }
+    ],
+    {
+      duration: duration * 1000,
+      easing: "linear",
+      iterations: Infinity
+    }
+  );
+
+  heartsBg.appendChild(heart);
+}
+
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+// init – postupne, nech to nevybuchne naraz
+for (let i = 0; i < HEART_COUNT; i++) {
+  setTimeout(createHeart, i * 900);
+}

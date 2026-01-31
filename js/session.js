@@ -41,4 +41,21 @@
     tryLoadFromUrl,
     buildSessionUrl,
   };
+
+  function decodePayloadFromUrl(url) {
+  try {
+    const u = new URL(url);
+    const hash = u.hash || "";
+    if (!hash.startsWith("#s=")) return null;
+
+    const token = hash.slice(3);
+    const json = window.Utils.base64UrlDecode(token);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+window.Session.decodePayloadFromUrl = decodePayloadFromUrl;
+
 })();

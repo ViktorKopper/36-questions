@@ -5,10 +5,10 @@
 :root {
   --bg-main: #000000;
 
-  --pink-1: #fbcfe8; /* very light pink (text highlights) */
-  --pink-2: #f472b6; /* primary pink */
-  --pink-3: #ec4899; /* strong pink */
-  --pink-4: #be185d; /* dark pink */
+  --pink-1: #fbcfe8;
+  --pink-2: #f472b6;
+  --pink-3: #ec4899;
+  --pink-4: #be185d;
 
   --card-bg: #050505;
   --border: #2a0e1f;
@@ -56,10 +56,16 @@ h1 {
 .meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   font-size: 0.9rem;
   opacity: 0.9;
   margin-top: 10px;
   color: var(--pink-1);
+}
+
+#set, #player {
+  white-space: nowrap;
 }
 
 /* ================================
@@ -81,7 +87,7 @@ h1 {
 }
 
 /* ================================
-   Notes
+   Textareas (answers)
    ================================ */
 
 textarea {
@@ -92,7 +98,7 @@ textarea {
   border: 1px solid var(--border);
   background: #020202;
   color: var(--pink-1);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   resize: vertical;
   outline: none;
 }
@@ -106,8 +112,30 @@ textarea::placeholder {
   color: var(--pink-4);
 }
 
+.answers {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.answer-label {
+  display: block;
+  margin: 6px 0 6px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  color: var(--pink-1);
+}
+
+#theirNote {
+  opacity: 0.85;
+  filter: brightness(0.95);
+}
+
+#theirNote[readonly] {
+  cursor: not-allowed;
+}
+
 /* ================================
-   Controls (ALL buttons same style)
+   Controls (buttons)
    ================================ */
 
 .controls {
@@ -160,6 +188,27 @@ button:disabled {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* input in controls */
+.controls input {
+  flex: 2;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #020202;
+  color: var(--pink-1);
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.controls input:focus {
+  border-color: rgba(236, 72, 153, 0.7);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+}
+
+.controls input::placeholder {
+  color: var(--pink-4);
 }
 
 /* ================================
@@ -231,15 +280,11 @@ button:disabled {
 
 .hidden { display: none; }
 
-/* Mobile friendly: stack controls */
+/* Mobile friendly */
 @media (max-width: 540px) {
   body { padding: 20px; }
-  .controls {
-    flex-direction: column;
-  }
-  button {
-    width: 100%;
-  }
+  .controls { flex-direction: column; }
+  button { width: 100%; }
 }
 
 /* ================================
@@ -251,7 +296,13 @@ button:disabled {
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 1; /* behind content, but visible */
+  z-index: 1;
+}
+
+/* soft vignette mask */
+#hearts-bg {
+  -webkit-mask-image: radial-gradient(circle at center, transparent 0%, black 45%);
+  mask-image: radial-gradient(circle at center, transparent 0%, black 45%);
 }
 
 .heart {
@@ -260,7 +311,7 @@ button:disabled {
   background-size: contain;
   background-repeat: no-repeat;
 
-  opacity: var(--opacity, 0.08);
+  opacity: var(--opacity, 0.12);
   filter:
     brightness(1.20)
     saturate(1.5)
@@ -271,30 +322,11 @@ button:disabled {
     scale(var(--scale, 1));
 
   will-change: transform;
-
-}
-
-
-#hearts-bg {
-  mask-image: radial-gradient(
-    circle at center,
-    transparent 0%,
-    black 45%
-  );
 }
 
 /* ================================
-   Progress bar (replaces #progress)
+   Progress bar
    ================================ */
-
-.meta {
-  align-items: center;
-  gap: 12px;
-}
-
-#set, #player {
-  white-space: nowrap;
-}
 
 .progress-wrap {
   flex: 1;
@@ -324,26 +356,6 @@ button:disabled {
   font-size: 0.8rem;
   text-align: center;
   opacity: 0.85;
-}
-
-.controls input {
-  flex: 2;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: #020202;
-  color: var(--pink-1);
-  outline: none;
-  font-size: 0.95rem;
-}
-
-.controls input:focus {
-  border-color: rgba(236, 72, 153, 0.7);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-}
-
-.controls input::placeholder {
-  color: var(--pink-4);
 }
 
 /* ================================
@@ -396,7 +408,7 @@ button:disabled {
 .dot-b { background: rgba(251, 207, 232, 0.75); }
 
 .answered-table-wrap {
-  max-height: 220px; /* scroll */
+  max-height: 220px;
   overflow: auto;
   border-radius: 12px;
 }
@@ -448,12 +460,10 @@ button:disabled {
   height: 10px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.18);
-  opacity: 0.35; /* default = unanswered */
+  opacity: 0.35; /* unanswered */
 }
 
-.badge.on {
-  opacity: 1;
-}
+.badge.on { opacity: 1; }
 
 .badge.a { background: rgba(236, 72, 153, 0.95); }
 .badge.b { background: rgba(251, 207, 232, 0.75); }
@@ -465,5 +475,5 @@ button:disabled {
 
 @media (max-width: 540px) {
   .answered-table-wrap { max-height: 260px; }
-  .answered-legend { display: none; } /* nech to nie je preplnené */
+  .answered-legend { display: none; }
 }

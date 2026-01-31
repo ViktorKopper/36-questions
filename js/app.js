@@ -1,69 +1,4 @@
-/* ================================
-   Background hearts generator
-   ================================ */
-
-(function generateHearts() {
-  const container = document.getElementById("hearts-bg");
-  if (!container) return;
-
-  const HEART_COUNT = 28; // uprav podľa chuti
-
-  for (let i = 0; i < HEART_COUNT; i++) {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-
-    const size = Math.random() * 120 + 40; // 40px – 160px
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
-    const opacity = Math.random() * 0.25 + 0.05;
-    const brightness = Math.random() * 0.6 + 0.5;
-    const rotation = Math.random() * 40 - 20;
-
-    heart.style.width = `${size}px`;
-    heart.style.height = `${size}px`;
-    heart.style.left = `${x}%`;
-    heart.style.top = `${y}%`;
-    heart.style.opacity = opacity;
-    heart.style.filter = `brightness(${brightness})`;
-    heart.style.setProperty("--rot", `${rotation}deg`);
-
-    container.appendChild(heart);
-  }
-})();
-
-(() => {
-  // -----------------------------
-  // Helpers
-  // -----------------------------
-  const qs = (id) => document.getElementById(id);
-
-  function safeParse(json) {
-    try { return JSON.parse(json); } catch { return null; }
-  }
-
-  function encodeSession(data) {
-    const json = JSON.stringify(data);
-    return btoa(unescape(encodeURIComponent(json)));
-  }
-
-  function decodeSession(str) {
-    const json = decodeURIComponent(escape(atob(str)));
-    return JSON.parse(json);
-  }
-
-  function shuffle(array) {
-    const arr = array.slice();
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
-
-  function getQuestionById(id) {
-    return window.questions.find((q) => q.id === id);
-  }
-
+(function () {
   // -----------------------------
   // Data check
   // -----------------------------
@@ -76,6 +11,8 @@
   // -----------------------------
   // DOM
   // -----------------------------
+  const qs = window.Utils.qs;
+
   const startScreen = qs("start-screen");
   const appScreen = document.querySelector(".app");
 
@@ -100,65 +37,8 @@
   // -----------------------------
   // State
   // -----------------------------
-  let state = safeParse(localStorage.getItem("gameState")) || {
-    index: 0,
-    player: "A",
-    players: { A: "", B: "" },
-    notes: {},
-    order: [] // random order of question IDs
-  };
-
-  // Backward-compatible defaults (older saved state migration)
-  state.players = state.players || { A: "", B: "" };
-  state.notes = state.notes || {};
-  state.order = Array.isArray(state.order) ? state.order : [];
-  if (typeof state.index !== "number") state.index = 0;
-  if (state.player !== "A" && state.player !== "B") state.player = "A";
-
-  function save() {
-    localStorage.setItem("gameState", JSON.stringify(state));
-  }
-
-  // -----------------------------
-  // URL session (share/join)
-  // -----------------------------
-  function tryLoadFromUrl() {
-    if (!location.hash.startsWith("#session=")) return false;
-    const token = location.hash.slice("#session=".length);
-
-    try {
-      const payload = decodeSession(token);
-
-      state.index = typeof payload.index === "number" ? payload.index : 0;
-      state.player = payload.player === "A" || payload.player === "B" ? payload.player : "A";
-      state.players = payload.players || { A: "", B: "" };
-      state.notes = payload.notes || {};
-      state.order = Array.isArray(payload.order) ? payload.order : [];
-
-      // apply defaults again just in case
-      state.players = state.players || { A: "", B: "" };
-      state.notes = state.notes || {};
-      state.order = Array.isArray(state.order) ? state.order : [];
-
-      save();
-      return true;
-    } catch (e) {
-      console.error("Failed to load session from URL", e);
-      return false;
-    }
-  }
-
-  function buildSessionUrl() {
-    const payload = {
-      index: state.index,
-      player: state.player,
-      players: state.players,
-      notes: state.notes,
-      order: state.order
-    };
-    const token = encodeSession(payload);
-    return `${location.origin}${location.pathname}#session=${token}`;
-  }
+  const state = window.Store.load();
+  const save = () => window.Store.save(state);
 
   // -----------------------------
   // UI helpers
@@ -193,9 +73,9 @@
     const set3 = questions.filter((q) => q.set === 3).map((q) => q.id);
 
     state.order = [
-      ...shuffle(set1),
-      ...shuffle(set2),
-      ...shuffle(set3)
+      ...window.Utils.shuffle(set1),
+      ...window.Utils.shuffle(set2),
+      ...window.Utils.shuffle(set3),
     ];
   }
 
@@ -203,13 +83,13 @@
     ensureOrder();
 
     const questionId = state.order[state.index];
-    const q = getQuestionById(questionId);
+    const q = window.Utils.getQuestionById(questions, questionId);
 
     if (!q) {
       // Safety fallback
       state.index = 0;
       const firstId = state.order[0];
-      const firstQ = getQuestionById(firstId);
+      const firstQ = window.Utils.getQuestionById(questions, firstId);
       qText.textContent = firstQ ? firstQ.text : "Question not found.";
       save();
       return;
@@ -255,7 +135,6 @@
 
     state.players.A = nameA;
     state.players.B = nameB;
-
     ensureOrder();
 
     save();
@@ -269,7 +148,7 @@
   note.addEventListener("input", () => {
     ensureOrder();
     const questionId = state.order[state.index];
-    const q = getQuestionById(questionId);
+    const q = window.Utils.getQuestionById(questions, questionId);
     if (!q) return;
 
     state.notes[q.id] = note.value;
@@ -280,7 +159,9 @@
   prevBtn.addEventListener("click", prev);
 
   resetBtn.addEventListener("click", () => {
-    localStorage.removeItem("gameState");
+    const ok = confirm("Reset the whole game? This will delete all progress and notes.");
+    if (!ok) return;
+    window.Store.clear();
     location.hash = "";
     location.reload();
   });
@@ -294,12 +175,12 @@
   });
 
   shareBtn?.addEventListener("click", () => {
-    const url = buildSessionUrl();
+    const url = window.Session.buildSessionUrl(state);
     setShareMessage("Session link created. Tap “Copy Link” and send it to your partner.", url);
   });
 
   copyBtn?.addEventListener("click", async () => {
-    const link = shareInfo.dataset.link || buildSessionUrl();
+    const link = shareInfo.dataset.link || window.Session.buildSessionUrl(state);
     try {
       await navigator.clipboard.writeText(link);
       setShareMessage("Copied ✅ Send the link to your partner.", link);
@@ -312,7 +193,7 @@
   // -----------------------------
   // Boot
   // -----------------------------
-  tryLoadFromUrl();
+  window.Session.tryLoadFromUrl(state);
 
   if (state.players.A && state.players.B) {
     showGameScreen();

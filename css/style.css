@@ -1,3 +1,13 @@
+/* =========================================================
+   36 Questions — Refactored style.css
+   - removed duplicated role styles
+   - fixed z-index layering (hearts always behind)
+   - role panel is hard foreground (no hearts bleeding through)
+   ========================================================= */
+
+/* =========================
+   THEME / TOKENS
+   ========================= */
 :root{
   --bg-main:#000;
 
@@ -5,6 +15,9 @@
   --pink-2:#f472b6;
   --pink-3:#ec4899;
   --pink-4:#be185d;
+
+  --purple-1:#d8b4fe;
+  --purple-2:#a855f7;
 
   --ink: rgba(251, 207, 232, 0.95);
 
@@ -29,6 +42,9 @@
     0 0 140px rgba(236, 72, 153, 0.28);
 }
 
+/* =========================
+   BASE
+   ========================= */
 *{ box-sizing:border-box; }
 html, body{ height:100%; }
 
@@ -49,6 +65,7 @@ body{
 
 .hidden{ display:none !important; }
 
+/* Headings */
 h1{
   margin: 4px 0 12px;
   text-align:center;
@@ -63,13 +80,15 @@ h1{
   color: var(--pink-1);
 }
 
-/* Hearts */
+/* =========================
+   BACKGROUND HEARTS (ALWAYS BEHIND)
+   ========================= */
 #hearts-bg{
   position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events:none;
-  z-index: 1;
+  z-index: 0; /* ✅ behind everything */
 }
 
 .heart{
@@ -84,9 +103,12 @@ h1{
   will-change: transform;
 }
 
-.start-screen, .game-layout{ position:relative; z-index:2; }
+/* Foreground containers (above hearts) */
+.start-screen, .game-layout, .role-screen{ position:relative; z-index: 2; }
 
-/* Panels */
+/* =========================
+   PANELS (Start + Game)
+   ========================= */
 .start-screen{
   width: min(460px, 100%);
   padding: 26px;
@@ -95,6 +117,7 @@ h1{
   border: 2px solid rgba(236, 72, 153, 0.42);
   box-shadow: var(--shadow-panel);
   backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
 .game-layout{
@@ -113,6 +136,7 @@ h1{
   border: 2px solid rgba(236, 72, 153, 0.42);
   box-shadow: var(--shadow-panel);
   backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
 .answered-panel{
@@ -123,12 +147,15 @@ h1{
   border: 2px solid rgba(236, 72, 153, 0.42);
   box-shadow: var(--shadow-panel);
   backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
 
   position: sticky;
   top: 18px;
 }
 
-/* Inputs */
+/* =========================
+   INPUTS
+   ========================= */
 input, textarea{
   width:100%;
   font: inherit;
@@ -166,7 +193,9 @@ textarea[readonly]{
   opacity: 0.9;
 }
 
-/* Meta + progress */
+/* =========================
+   META + PROGRESS
+   ========================= */
 .meta{
   display:flex;
   align-items:center;
@@ -201,7 +230,9 @@ textarea[readonly]{
   opacity: 0.85;
 }
 
-/* Question card */
+/* =========================
+   QUESTION CARD
+   ========================= */
 .card{
   margin: 18px 0;
   padding: 22px;
@@ -241,7 +272,9 @@ textarea[readonly]{
   100%{ transform: translateY(0); filter: brightness(1.0); }
 }
 
-/* Controls + buttons */
+/* =========================
+   BUTTONS
+   ========================= */
 .controls{
   margin-top: 12px;
   display:flex;
@@ -296,7 +329,9 @@ textarea[readonly]{
   min-height: 1.2em;
 }
 
-/* Answered table */
+/* =========================
+   ANSWERED TABLE
+   ========================= */
 .answered-head{
   display:flex;
   justify-content:space-between;
@@ -385,13 +420,9 @@ textarea[readonly]{
 
 .qtext{ opacity: 0.92; line-height: 1.25; }
 
-@media (max-width: 900px){
-  .game-layout{ flex-direction: column; }
-  .answered-panel{ position: static; width: 100%; }
-  .answered-table-wrap{ max-height: 280px; }
-  .controls{ flex-direction: column; align-items: stretch; }
-}
-
+/* =========================
+   DEVICE ROLE SWITCH (in-game)
+   ========================= */
 .device-role{
   display:flex;
   align-items:center;
@@ -440,23 +471,23 @@ textarea[readonly]{
   opacity: 0.75;
 }
 
-/* HOW TO PLAY – Glass modal */
-
+/* =========================
+   GLASS MODALS (How to play / merge)
+   ========================= */
 .glass-modal{
   position: fixed;
   inset: 0;
   z-index: 50;
 }
 
-.glass-modal.hidden{
-  display: none;
-}
+.glass-modal.hidden{ display:none; }
 
 .glass-backdrop{
   position:absolute;
   inset:0;
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .glass-card{
@@ -466,12 +497,7 @@ textarea[readonly]{
   padding: 18px;
   border-radius: 20px;
 
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.12),
-    rgba(255,255,255,0.04)
-  );
-
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
@@ -492,13 +518,8 @@ textarea[readonly]{
   line-height: 1.5;
 }
 
-.howto-steps{
-  padding-left: 18px;
-}
-
-.howto-steps li{
-  margin-bottom: 10px;
-}
+.howto-steps{ padding-left: 18px; }
+.howto-steps li{ margin-bottom: 10px; }
 
 .howto-note{
   margin-top: 14px;
@@ -506,228 +527,40 @@ textarea[readonly]{
   opacity: 0.8;
 }
 
-/* ROLE SELECTION SCREEN */
-
+/* =========================
+   ROLE SELECTION (FOREIGN, HARD PANEL)
+   ========================= */
 .role-screen{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  gap:18px;
-  color:#fce7f3;
-}
-
-.role-title{
-  font-size:2rem;
-  margin-bottom:10px;
-}
-
-.role-sub{
-  opacity:.85;
-  max-width:420px;
-}
-
-.role-cards{
-  display:flex;
-  gap:24px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-top:10px;
-}
-
-.role-card{
-  width:260px;
-  padding:22px;
-  border-radius:22px;
-  cursor:pointer;
-
-  background:rgba(0,0,0,.22);
-  border: 1px solid rgba(255,255,255,0.10);
-  backdrop-filter:blur(12px);
-
-  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-
-.role-card:hover{
-  transform:translateY(-4px);
-}
-
-.role-card.role-a{
-  border-color:rgba(236,72,153,.6);
-  box-shadow:0 0 30px rgba(236,72,153,.35);
-}
-
-.role-card.role-b{
-  border-color:rgba(168,85,247,.6);
-  box-shadow:0 0 30px rgba(168,85,247,.35);
-}
-
-.role-card.selected{
-  outline:3px solid rgba(255,255,255,.25);
-}
-
-.role-heart{
-  font-size:2.4rem;
-  margin-bottom:10px;
-}
-
-.role-warning{
-  font-size:.9rem;
-  opacity:.75;
-  margin-top:8px;
-}
-
-/* ROLE SELECTION — force readable text */
-
-.role-card{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-
-  color: rgba(252, 231, 243, 0.95) !important; /* ✅ force readable */
-  text-align:center;
-
-  width: 300px;
-  min-height: 210px;
-
-  padding: 22px;
-  border-radius: 22px;
-
-  background: rgba(0,0,0,0.35);
-  border: 2px solid rgba(255,255,255,0.10);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-
-.role-card h3{
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: rgba(252, 231, 243, 0.98) !important;
-}
-
-.role-card p{
-  margin: 0;
-  font-size: 0.95rem;
-  opacity: 0.82;
-  max-width: 240px;
-  color: rgba(252, 231, 243, 0.88) !important;
-}
-
-.role-heart{
-  font-size: 2.6rem;
-  line-height: 1;
-  margin-bottom: 4px;
-  text-shadow: 0 0 18px rgba(236,72,153,0.35);
-}
-
-/* neon borders per role */
-.role-card.role-a{
-  border-color: rgba(236,72,153,0.65);
-  box-shadow: 0 0 34px rgba(236,72,153,0.28);
-}
-.role-card.role-b{
-  border-color: rgba(168,85,247,0.65);
-  box-shadow: 0 0 34px rgba(168,85,247,0.24);
-}
-
-.role-card:hover{ transform: translateY(-4px); }
-
-.role-card.selected{
-  outline: 3px solid rgba(255,255,255,0.22);
-  box-shadow: 0 0 42px rgba(255,255,255,0.06);
-}
-
-/* ROLE PANEL — shared glass container with pink/purple split glow */
-
-.role-panel{
-  position: relative;
-  padding: 26px 28px;
-  border-radius: 26px;
-
-  background: rgba(0,0,0,0.32);
-  border: 1px solid rgba(236,72,153,0.18);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-
-  box-shadow: 0 22px 80px rgba(0,0,0,0.65);
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-/* the colored underlay */
-.role-panel::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(600px 280px at 25% 40%, rgba(236,72,153,0.33), transparent 60%),
-    radial-gradient(600px 280px at 75% 40%, rgba(168,85,247,0.28), transparent 60%);
-  filter: blur(2px);
-  opacity: 1;
-  pointer-events: none;
-}
-
-/* subtle highlight line like your other panels */
-.role-panel::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius: 26px;
-  background: linear-gradient(90deg,
-    rgba(236,72,153,0.22),
-    rgba(255,255,255,0.06),
-    rgba(168,85,247,0.18)
-  );
-  opacity: .25;
-  pointer-events:none;
-}
-
-/* keep real content above underlay */
-.role-panel > *{
-  position: relative;
-  z-index: 1;
-}
-
-/* role cards inside panel spacing */
-.role-cards{
-  display:flex;
-  gap: 22px;
-  flex-wrap: wrap;
-  justify-content:center;
-}
-
-/* ROLE SCREEN — everything inside one glass panel */
-
-.role-screen{
-  min-height:100vh;
+  min-height: 100vh;
   display:flex;
   justify-content:center;
   align-items:center;
   padding: 28px 16px;
-  color:#fce7f3;
   text-align:center;
+
+  position: relative;
+  z-index: 3; /* ✅ definitely above hearts */
 }
 
 .role-shell{
   position: relative;
+  z-index: 4;
   width: min(860px, 96vw);
   padding: 34px 28px;
   border-radius: 28px;
+  overflow: hidden;
 
-  background: rgba(0,0,0,0.33);
-  border: 1px solid rgba(236,72,153,0.18);
+  /* ✅ HARD FOREGROUND SURFACE (stops hearts bleeding through) */
+  isolation: isolate; /* creates new stacking context */
+  background:
+    linear-gradient(rgba(10,10,10,0.86), rgba(10,10,10,0.86)),
+    rgba(0,0,0,0.30);
+
+  border: 1px solid rgba(236,72,153,0.20);
+  box-shadow: 0 24px 90px rgba(0,0,0,0.70);
+
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
-  box-shadow: 0 24px 90px rgba(0,0,0,0.70);
-  overflow: hidden;
 }
 
 /* pink left + purple right underglow */
@@ -735,12 +568,14 @@ textarea[readonly]{
   content:"";
   position:absolute;
   inset:-2px;
+  z-index: 0;
+  pointer-events:none;
+
   background:
     radial-gradient(720px 360px at 18% 40%, rgba(236,72,153,0.35), transparent 62%),
     radial-gradient(720px 360px at 82% 40%, rgba(168,85,247,0.30), transparent 62%),
-    radial-gradient(900px 480px at 50% 110%, rgba(255,255,255,0.06), transparent 55%);
+    radial-gradient(900px 480px at 50% 110, rgba(255,255,255,0.05), transparent 55%);
   filter: blur(2px);
-  pointer-events:none;
 }
 
 /* subtle border sheen */
@@ -748,14 +583,16 @@ textarea[readonly]{
   content:"";
   position:absolute;
   inset:0;
+  z-index: 0;
   border-radius: 28px;
+  pointer-events:none;
+
   background: linear-gradient(90deg,
     rgba(236,72,153,0.22),
     rgba(255,255,255,0.08),
     rgba(168,85,247,0.18)
   );
-  opacity: .20;
-  pointer-events:none;
+  opacity: .18;
 }
 
 .role-shell > *{
@@ -775,6 +612,7 @@ textarea[readonly]{
   max-width: 520px;
 }
 
+/* Cards */
 .role-cards{
   display:flex;
   gap:22px;
@@ -783,13 +621,85 @@ textarea[readonly]{
   margin: 14px 0 10px;
 }
 
+.role-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  width: 300px;
+  min-height: 210px;
+  padding: 22px;
+
+  border-radius: 22px;
+  cursor:pointer;
+
+  text-align:center;
+  color: rgba(252,231,243,0.95);
+
+  background: rgba(0,0,0,0.20);
+  border: 1px solid rgba(255,255,255,0.10);
+
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, filter .15s ease;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+}
+
+.role-card:hover{ transform: translateY(-4px); filter: brightness(1.05); }
+
+.role-card h3{
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: rgba(252,231,243,0.98);
+}
+
+.role-card p{
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.82;
+  max-width: 240px;
+  color: rgba(252,231,243,0.88);
+}
+
+.role-heart{
+  font-size: 2.6rem;
+  line-height: 1;
+  margin-bottom: 4px;
+  text-shadow: 0 0 18px rgba(236,72,153,0.35);
+}
+
+.role-card.role-a{
+  border-color: rgba(236,72,153,0.65);
+  box-shadow: 0 0 34px rgba(236,72,153,0.22), 0 18px 50px rgba(0,0,0,0.55);
+}
+
+.role-card.role-b{
+  border-color: rgba(168,85,247,0.65);
+  box-shadow: 0 0 34px rgba(168,85,247,0.20), 0 18px 50px rgba(0,0,0,0.55);
+}
+
+.role-card.selected{
+  outline: 3px solid rgba(255,255,255,0.22);
+  box-shadow: 0 0 42px rgba(255,255,255,0.06), 0 18px 50px rgba(0,0,0,0.55);
+}
+
 .role-warning{
   font-size:.92rem;
   opacity:.78;
   margin: 10px 0 18px;
 }
 
-/* mobile stacking */
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 900px){
+  .game-layout{ flex-direction: column; }
+  .answered-panel{ position: static; width: 100%; }
+  .answered-table-wrap{ max-height: 280px; }
+  .controls{ flex-direction: column; align-items: stretch; }
+}
+
 @media (max-width: 640px){
   .role-shell{ padding: 26px 16px; }
   .role-card{ width: 100%; max-width: 340px; }

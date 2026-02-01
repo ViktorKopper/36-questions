@@ -504,3 +504,505 @@ textarea.is-locked {
 
 /* Answered table: draft vs locked */
 .badge.draft { opacity: 0.75; }
+
+/* ================================
+   Phase 2A (1): Reveal moment animation
+   ================================ */
+
+.reveal-pop {
+  animation: revealPop 0.55s ease;
+  box-shadow: 0 0 0 3px rgba(236,72,153,0.20), 0 12px 30px rgba(236,72,153,0.18);
+}
+
+@keyframes revealPop {
+  0% { transform: translateY(2px); filter: brightness(0.9); }
+  60% { transform: translateY(0); filter: brightness(1.15); }
+  100% { transform: translateY(0); filter: brightness(1.0); }
+}
+
+/* ================================
+   Modern Controls / Toolbars (Phase 2 UX)
+   Drop-in override: paste at END of style.css
+   ================================ */
+
+/* Slightly better overall rhythm */
+.app {
+  gap: 14px;
+}
+
+/* Controls rows become "toolbars" */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(8, 8, 8, 0.55);
+  border: 1px solid rgba(236, 72, 153, 0.14);
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.06),
+    0 18px 50px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+/* Make the "import" row 2 columns (input bigger) */
+.controls:has(input) {
+  grid-template-columns: 2.2fr 1fr;
+}
+
+/* Make share/copy row 2 columns (nicer) */
+.controls:has(#share):has(#copyLink) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Buttons: modern pill */
+.controls button,
+button.btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 14px;
+  min-height: 46px;
+
+  font-weight: 750;
+  letter-spacing: 0.02em;
+
+  color: rgba(255, 255, 255, 0.92);
+  background:
+    radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,0.16), rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(236, 72, 153, 0.92), rgba(190, 24, 93, 0.92));
+
+  box-shadow:
+    0 10px 26px rgba(236, 72, 153, 0.18),
+    0 0 0 1px rgba(236, 72, 153, 0.22),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+
+  cursor: pointer;
+  transition:
+    transform 0.14s ease,
+    filter 0.14s ease,
+    box-shadow 0.14s ease,
+    opacity 0.14s ease;
+}
+
+.controls button:hover,
+button.btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 14px 34px rgba(236, 72, 153, 0.22),
+    0 0 0 1px rgba(236, 72, 153, 0.26),
+    inset 0 1px 0 rgba(255,255,255,0.16);
+}
+
+.controls button:active,
+button.btn:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+  box-shadow:
+    0 9px 22px rgba(236, 72, 153, 0.16),
+    0 0 0 1px rgba(236, 72, 153, 0.20),
+    inset 0 1px 0 rgba(0,0,0,0.08);
+}
+
+.controls button:focus-visible,
+button.btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(236, 72, 153, 0.18),
+    0 0 0 1px rgba(236, 72, 153, 0.26),
+    0 16px 36px rgba(236, 72, 153, 0.20);
+}
+
+/* Secondary / ghost styles using your existing classes */
+.btn.btn-secondary,
+.controls .btn-secondary {
+  background:
+    radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,0.12), rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(30, 30, 30, 0.85), rgba(10, 10, 10, 0.85));
+  color: rgba(251, 207, 232, 0.95);
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(236, 72, 153, 0.16),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+.btn.btn-ghost,
+.controls .btn-ghost {
+  background: rgba(255,255,255,0.04);
+  color: rgba(251, 207, 232, 0.9);
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.12),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Disabled */
+.controls button:disabled,
+button.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.12),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Input inside controls: modern "field" */
+.controls input {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 999px;
+  padding: 12px 16px;
+
+  border: 1px solid rgba(236, 72, 153, 0.16);
+  background:
+    radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%),
+    rgba(0,0,0,0.55);
+
+  color: rgba(251, 207, 232, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 12px 30px rgba(0,0,0,0.55);
+}
+
+.controls input:focus {
+  outline: none;
+  border-color: rgba(236, 72, 153, 0.35);
+  box-shadow:
+    0 0 0 3px rgba(236, 72, 153, 0.16),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 12px 30px rgba(0,0,0,0.55);
+}
+
+.controls input::placeholder {
+  color: rgba(190, 24, 93, 0.95);
+  opacity: 0.75;
+}
+
+/* Mobile: stack nicely */
+@media (max-width: 540px) {
+  .controls {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .controls:has(input) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================================
+   Big Foreground Panel (Glass Segment)
+   Paste at END of style.css
+   ================================ */
+
+/* Center page nicely + keep hearts behind */
+body {
+  align-items: center;              /* vertical center feel */
+  padding: 36px 18px;               /* nicer edges on mobile */
+}
+
+/* One big panel for the whole app */
+.app,
+.start-screen {
+  width: min(760px, 100%);
+  padding: 26px;
+  border-radius: 26px;
+
+  /* glass background */
+  background:
+    radial-gradient(120% 120% at 20% 0%, rgba(236,72,153,0.10), rgba(0,0,0,0) 52%),
+    rgba(5, 5, 5, 0.58);
+
+  border: 1px solid rgba(236, 72, 153, 0.16);
+
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.05),
+    0 28px 90px rgba(0, 0, 0, 0.72);
+
+  backdrop-filter: blur(14px);
+}
+
+/* Optional: inner glow edge (looks premium) */
+.app::before,
+.start-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    inset 0 0 0 1px rgba(236,72,153,0.06);
+  opacity: 0.9;
+}
+
+/* Ensure pseudo-element works (positioning) */
+.app,
+.start-screen {
+  position: relative;
+}
+
+/* Pull content above ::before */
+.app > *,
+.start-screen > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Slightly tighten typography inside the big panel */
+.app h1,
+.start-screen h1 {
+  margin-top: 4px;
+}
+
+.meta {
+  margin-top: 14px;
+}
+
+/* Now that we have a big panel, reduce extra “panel” look of controls rows */
+.controls {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(236,72,153,0.10);
+  box-shadow:
+    0 0 0 1px rgba(236,72,153,0.04),
+    0 14px 40px rgba(0,0,0,0.55);
+}
+
+/* Make answered section blend into the big panel */
+.answered-wrap {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(236,72,153,0.12);
+}
+
+/* Card a textareas can be a bit lighter now */
+.card {
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(236,72,153,0.14);
+}
+
+textarea {
+  background: rgba(0,0,0,0.40);
+  border: 1px solid rgba(236,72,153,0.14);
+}
+
+/* Mobile: keep it comfy */
+@media (max-width: 540px) {
+  .app,
+  .start-screen {
+    padding: 18px;
+    border-radius: 22px;
+  }
+}
+
+/* ================================
+   Rose / Pink Glass Tint (Foreground)
+   Paste at END of style.css
+   ================================ */
+
+/* Main glass container tint */
+.app,
+.start-screen {
+  background:
+    /* top pink glow */
+    radial-gradient(
+      120% 80% at 20% -10%,
+      rgba(236, 72, 153, 0.18),
+      rgba(236, 72, 153, 0.06) 38%,
+      rgba(0, 0, 0, 0) 60%
+    ),
+
+    /* bottom red warmth */
+    radial-gradient(
+      140% 100% at 80% 110%,
+      rgba(190, 24, 93, 0.16),
+      rgba(190, 24, 93, 0.05) 40%,
+      rgba(0, 0, 0, 0) 65%
+    ),
+
+    /* base glass */
+    linear-gradient(
+      180deg,
+      rgba(12, 6, 10, 0.78),
+      rgba(5, 5, 5, 0.88)
+    );
+
+  border: 1px solid rgba(236, 72, 153, 0.22);
+
+  box-shadow:
+    /* outer glow */
+    0 0 0 1px rgba(236, 72, 153, 0.08),
+    0 30px 100px rgba(0, 0, 0, 0.75),
+
+    /* subtle pink ambient glow */
+    0 0 120px rgba(236, 72, 153, 0.12);
+
+  backdrop-filter: blur(16px) saturate(1.15);
+}
+
+/* Inner glass highlight (premium feel) */
+.app::before,
+.start-screen::before {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 0 0 1px rgba(236,72,153,0.10),
+    inset 0 -20px 40px rgba(236,72,153,0.04);
+}
+
+/* Slight pink reflection on cards */
+.card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236,72,153,0.04),
+      rgba(0,0,0,0.45)
+    ),
+    rgba(0,0,0,0.45);
+
+  box-shadow:
+    0 0 0 1px rgba(236,72,153,0.10),
+    0 16px 40px rgba(0,0,0,0.55);
+}
+
+/* Textareas inherit glass tint */
+textarea {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236,72,153,0.03),
+      rgba(0,0,0,0.40)
+    ),
+    rgba(0,0,0,0.40);
+
+  border: 1px solid rgba(236,72,153,0.18);
+}
+
+/* Answered section blends with rose glass */
+.answered-wrap {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236,72,153,0.035),
+      rgba(0,0,0,0.30)
+    ),
+    rgba(0,0,0,0.30);
+
+  border: 1px solid rgba(236,72,153,0.14);
+}
+
+/* ================================
+   Stronger Rose Glass – Thicker Frame
+   Paste at END of style.css
+   ================================ */
+
+.app,
+.start-screen {
+  /* thicker, clearer border */
+  border: 2px solid rgba(236, 72, 153, 0.42);
+
+  /* stronger rose / wine tint */
+  background:
+    /* top rose highlight */
+    radial-gradient(
+      120% 85% at 18% -12%,
+      rgba(236, 72, 153, 0.32),
+      rgba(236, 72, 153, 0.12) 38%,
+      rgba(0, 0, 0, 0) 62%
+    ),
+
+    /* bottom wine warmth */
+    radial-gradient(
+      140% 110% at 82% 115%,
+      rgba(190, 24, 93, 0.30),
+      rgba(190, 24, 93, 0.10) 42%,
+      rgba(0, 0, 0, 0) 70%
+    ),
+
+    /* base glass */
+    linear-gradient(
+      180deg,
+      rgba(18, 8, 14, 0.82),
+      rgba(6, 6, 6, 0.92)
+    );
+
+  box-shadow:
+    /* crisp edge */
+    0 0 0 1px rgba(236, 72, 153, 0.35),
+
+    /* depth */
+    0 32px 110px rgba(0, 0, 0, 0.80),
+
+    /* ambient rose glow */
+    0 0 140px rgba(236, 72, 153, 0.28);
+
+  backdrop-filter: blur(18px) saturate(1.25);
+}
+
+/* Inner edge highlight – makes border feel "thick" */
+.app::before,
+.start-screen::before {
+  box-shadow:
+    inset 0 0 0 1px rgba(236, 72, 153, 0.22),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -28px 60px rgba(236,72,153,0.10);
+}
+
+/* Cards pop a bit more from glass */
+.card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236,72,153,0.08),
+      rgba(0,0,0,0.48)
+    ),
+    rgba(0,0,0,0.48);
+
+  border: 1px solid rgba(236,72,153,0.28);
+
+  box-shadow:
+    0 0 0 1px rgba(236,72,153,0.18),
+    0 18px 46px rgba(0,0,0,0.60);
+}
+
+/* Textareas: slightly stronger pink edge */
+textarea {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236,72,153,0.06),
+      rgba(0,0,0,0.45)
+    ),
+    rgba(0,0,0,0.45);
+
+  border: 1px solid rgba(236,72,153,0.30);
+}
+
+textarea:focus {
+  border-color: rgba(236,72,153,0.55);
+  box-shadow:
+    0 0 0 3px rgba(236,72,153,0.22),
+    0 14px 40px rgba(0,0,0,0.65);
+}
+
+/* Answered table blends but stays defined */
+.answered-wrap {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236,72,153,0.06),
+      rgba(0,0,0,0.34)
+    ),
+    rgba(0,0,0,0.34);
+
+  border: 1px solid rgba(236,72,153,0.24);
+}
+
+/* Controls panel edge stronger */
+.controls {
+  border: 1px solid rgba(236,72,153,0.28);
+  box-shadow:
+    0 0 0 1px rgba(236,72,153,0.14),
+    0 16px 48px rgba(0,0,0,0.60);
+}

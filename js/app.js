@@ -53,6 +53,9 @@
   // Viewer: which device is A/B
   let viewer = window.Store.getViewer();
 
+  // Phase 2A (1): runtime-only memory to animate reveal once per question
+  const revealedMemory = {}; // qid -> boolean (not stored)
+
   function ensureViewer() {
     if (viewer === "A" || viewer === "B") return viewer;
 
@@ -312,13 +315,24 @@
     const entry = getEntry(qid);
     myNote.value = entry[me] || "";
 
-    // Reveal logic: only show partner answer when BOTH locked for this question
-    if (bothLocked(qid)) {
+    // Phase 2A (1): reveal animation only on transition hidden -> revealed
+    const nowRevealed = bothLocked(qid);
+    const wasRevealed = !!revealedMemory[qid];
+
+    if (nowRevealed) {
       theirNote.value = entry[them] || "";
       theirNote.placeholder = "Partner's answer";
+
+      if (!wasRevealed) {
+        revealedMemory[qid] = true;
+        theirNote.classList.add("reveal-pop");
+        setTimeout(() => theirNote.classList.remove("reveal-pop"), 650);
+      }
     } else {
       theirNote.value = "";
       theirNote.placeholder = "Hidden until both of you lock your answers…";
+      revealedMemory[qid] = false;
+      theirNote.classList.remove("reveal-pop");
     }
 
     updateLockUi(qid);

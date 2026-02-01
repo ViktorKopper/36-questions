@@ -391,3 +391,117 @@ textarea[readonly]{
   .answered-table-wrap{ max-height: 280px; }
   .controls{ flex-direction: column; align-items: stretch; }
 }
+
+.device-role{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 6px 0 10px;
+  color: rgba(251,207,232,0.85);
+}
+
+.device-role__label{
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.device-role__switch{
+  display:flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(236,72,153,0.20);
+}
+
+.device-role__btn{
+  cursor:pointer;
+  border: 1px solid rgba(236,72,153,0.18);
+  background: rgba(0,0,0,0.35);
+  color: rgba(251,207,232,0.85);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 800;
+  min-width: 44px;
+  transition: filter 0.15s ease, transform 0.08s ease;
+}
+
+.device-role__btn:active{ transform: translateY(1px); }
+
+.device-role__btn.is-active{
+  background: linear-gradient(90deg, rgba(244,114,182,0.92), rgba(236,72,153,0.95));
+  color: #0b0b0b;
+  border-color: rgba(236,72,153,0.35);
+}
+
+.device-role__hint{
+  font-size: 0.88rem;
+  opacity: 0.75;
+}
+
+/* HOW TO PLAY – Glass modal */
+
+.glass-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.glass-modal.hidden{
+  display: none;
+}
+
+.glass-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+}
+
+.glass-card{
+  position: relative;
+  max-width: 520px;
+  margin: 10vh auto;
+  padding: 18px;
+  border-radius: 20px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.04)
+  );
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(236,72,153,0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  color: #fce7f3;
+}
+
+.glass-header{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.glass-content{
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.howto-steps{
+  padding-left: 18px;
+}
+
+.howto-steps li{
+  margin-bottom: 10px;
+}
+
+.howto-note{
+  margin-top: 14px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}

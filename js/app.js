@@ -54,6 +54,16 @@
   const conflictModalClose = qs("conflictModalClose");
   const conflictModalBody = qs("conflictModalBody");
 
+  const deviceRoleSwitch = qs("deviceRoleSwitch");
+  const deviceRoleA = qs("deviceRoleA");
+  const deviceRoleB = qs("deviceRoleB");
+  const deviceRoleHint = qs("deviceRoleHint");
+
+  const howToBtn = qs("howToBtn");
+  const howToModal = qs("howToModal");
+  const howToBackdrop = qs("howToBackdrop");
+  const howToClose = qs("howToClose");
+
 
   // State
   const state = window.Store.load();
@@ -121,6 +131,27 @@
     if (t.length <= max) return t;
     return t.slice(0, max) + "…";
   }
+
+  function setViewer(newViewer) {
+    if (newViewer !== "A" && newViewer !== "B") return;
+    viewer = newViewer;
+    window.Store.setViewer(viewer);
+  }
+
+  function syncDeviceRoleUi() {
+    if (!deviceRoleA || !deviceRoleB) return;
+    const v = ensureViewer();
+
+    deviceRoleA.classList.toggle("is-active", v === "A");
+    deviceRoleB.classList.toggle("is-active", v === "B");
+
+    if (deviceRoleHint) {
+      deviceRoleHint.textContent = (v === "A")
+        ? "You are Player A ✅ (early Conclusion enabled)"
+        : "You are Player B";
+    }
+  }
+
 
   function openConflictModal(html) {
     if (!conflictModal || !conflictModalBody) return;
@@ -540,6 +571,10 @@
     updateLockUi(qid);
     renderAnsweredTable();
     renderMergeReport(state.mergeReport);
+    syncDeviceRoleUi();
+    if (finishBtn) finishBtn.classList.toggle("hidden", !isCompleteGame());
+    if (earlyFinishBtn) earlyFinishBtn.classList.toggle("hidden", !isViewerA());
+
     save();
   }
 
@@ -562,6 +597,34 @@
 
   // Events
   startBtn.addEventListener("click", startGame);
+
+  // Device role switch (A/B)
+  deviceRoleA?.addEventListener("click", () => {
+    setViewer("A");
+    syncDeviceRoleUi();
+    render(); // refresh UI immediately (reveals early button)
+  });
+
+  function openHowTo() {
+    howToModal.classList.remove("hidden");
+    howToModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeHowTo() {
+    howToModal.classList.add("hidden");
+    howToModal.setAttribute("aria-hidden", "true");
+  }
+
+  howToBtn?.addEventListener("click", openHowTo);
+  howToBackdrop?.addEventListener("click", closeHowTo);
+  howToClose?.addEventListener("click", closeHowTo);
+
+
+  deviceRoleB?.addEventListener("click", () => {
+    setViewer("B");
+    syncDeviceRoleUi();
+    render();
+  });
 
   myNote.addEventListener("input", () => {
     ensureOrder();

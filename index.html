@@ -71,9 +71,22 @@
         <button id="reset" class="btn btn-ghost">Reset</button>
       </div>
 
+      <div class="device-role">
+        <span class="device-role__label">This device:</span>
+
+        <div class="device-role__switch" id="deviceRoleSwitch" role="group" aria-label="Device role switch">
+          <button class="device-role__btn" id="deviceRoleA" type="button">A</button>
+          <button class="device-role__btn" id="deviceRoleB" type="button">B</button>
+        </div>
+
+        <span class="device-role__hint" id="deviceRoleHint"></span>
+      </div>
+
       <div class="controls">
         <button id="share" class="btn btn-secondary">Share Session</button>
         <button id="copyLink" class="btn btn-secondary">Copy Link</button>
+        <button id="howToBtn" class="btn btn-ghost btn-mini">How to play</button>
+
       </div>
 
       <div class="controls">
@@ -163,6 +176,34 @@
       <div class="modal-body" id="conflictModalBody"></div>
     </div>
   </div>
+
+  <div id="howToModal" class="glass-modal hidden" aria-hidden="true">
+    <div class="glass-backdrop" id="howToBackdrop"></div>
+
+    <div class="glass-card">
+      <div class="glass-header">
+        <h2>How to play ❤️</h2>
+        <button id="howToClose" class="btn btn-ghost">Close</button>
+      </div>
+
+      <div class="glass-content">
+        <ol class="howto-steps">
+          <li>Each of you answers privately on your own device ✍️</li>
+          <li>When ready, press <b>Lock my answer</b> 🔒</li>
+          <li>Answers stay hidden until <b>both</b> are locked 👀</li>
+          <li>Use <b>Share / Copy Link</b> to sync with your partner 🔗</li>
+          <li>If answers differ, resolve conflicts when importing ⚠️</li>
+          <li>Finish all questions — or open <b>Conclusion</b> early (Player A) 🧾</li>
+        </ol>
+
+        <p class="howto-note">
+          💡 Tip: This game works best when you don’t rush.  
+          Take your time and answer honestly.
+        </p>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Order matters -->
   <script src="./js/questions.js"></script>

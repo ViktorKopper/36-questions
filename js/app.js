@@ -36,6 +36,8 @@
   const nextBtn = qs("next");
   const resetBtn = qs("reset");
   const finishBtn = qs("finishBtn");
+  const earlyFinishBtn = qs("earlyFinishBtn");
+
 
 
   const shareBtn = qs("share");
@@ -77,6 +79,11 @@
     viewer = isA ? "A" : "B";
     window.Store.setViewer(viewer);
     return viewer;
+  }
+
+  function isViewerA() {
+    // viewer je "A" / "B" (device assignment)
+    return ensureViewer() === "A";
   }
 
   function otherPlayer(p) {
@@ -458,6 +465,9 @@
         if (finishBtn) {
           finishBtn.classList.toggle("hidden", !isCompleteGame());
         }
+        if (earlyFinishBtn) {
+          earlyFinishBtn.classList.toggle("hidden", !isViewerA());
+        }
         save();
         render();
       });
@@ -618,6 +628,21 @@
     if (!window.EndGame) return;
     window.EndGame.open(state);
   });
+
+  earlyFinishBtn?.addEventListener("click", () => {
+    if (!isViewerA()) {
+      alert("Only Player A can open early conclusion.");
+      return;
+    }
+    if (!window.EndGame) return;
+
+    // Optional confirmation, lebo je to “predčasne”
+    const ok = confirm("Open Conclusion early?\n\nUnfinished / unlocked answers may stay hidden.");
+    if (!ok) return;
+
+    window.EndGame.open(state);
+  });
+
 
   resetBtn.addEventListener("click", () => {
     const ok = confirm("Reset the whole game? This will delete all progress and answers.");

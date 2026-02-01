@@ -9,6 +9,7 @@
       player: "A", // whose turn label (optional, we still toggle)
       players: { A: "", B: "" },
       notes: {},   // { [qid]: {A:"",B:""} }
+      locks: {},   // { [qid]: {A:{locked:boolean, lockedAt:number|null}, B:{...}} }
       order: [],   // randomized order of question IDs
     };
   }
@@ -37,6 +38,39 @@
     return out;
   }
 
+  function normalizeLocks(locks) {
+    const out = (locks && typeof locks === "object") ? locks : {};
+    Object.keys(out).forEach((qid) => {
+      const v = out[qid];
+
+      // legacy boolean map -> upgrade
+      if (v && typeof v === "object" && (typeof v.A === "boolean" || typeof v.B === "boolean")) {
+        out[qid] = {
+          A: { locked: !!v.A, lockedAt: null },
+          B: { locked: !!v.B, lockedAt: null },
+        };
+        return;
+      }
+
+      if (!v || typeof v !== "object") {
+        out[qid] = {
+          A: { locked: false, lockedAt: null },
+          B: { locked: false, lockedAt: null },
+        };
+        return;
+      }
+
+      const a = v.A && typeof v.A === "object" ? v.A : {};
+      const b = v.B && typeof v.B === "object" ? v.B : {};
+
+      out[qid] = {
+        A: { locked: !!a.locked, lockedAt: typeof a.lockedAt === "number" ? a.lockedAt : null },
+        B: { locked: !!b.locked, lockedAt: typeof b.lockedAt === "number" ? b.lockedAt : null },
+      };
+    });
+    return out;
+  }
+
   function migrateState(raw) {
     const s = raw && typeof raw === "object" ? raw : {};
 
@@ -49,6 +83,9 @@
 
     s.order = Array.isArray(s.order) ? s.order : [];
     s.notes = normalizeNotes(s.notes);
+
+    // locks are optional -> migrate
+    s.locks = normalizeLocks(s.locks);
 
     return s;
   }

@@ -477,3 +477,30 @@ button:disabled {
   .answered-table-wrap { max-height: 260px; }
   .answered-legend { display: none; }
 }
+
+/* ================================
+   Phase 1: Lock + Reveal
+   ================================ */
+
+.lock-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -4px 0 14px;
+}
+
+.lock-info {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--pink-4);
+  opacity: 0.95;
+  text-align: left;
+}
+
+textarea.is-locked {
+  opacity: 0.75;
+  filter: brightness(0.9);
+}
+
+/* Answered table: draft vs locked */
+.badge.draft { opacity: 0.75; }

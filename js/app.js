@@ -27,6 +27,9 @@
   const myAnswerLabel = qs("myAnswerLabel");
   const theirAnswerLabel = qs("theirAnswerLabel");
 
+  const lockBtn = qs("lockBtn");
+  const lockInfo = qs("lockInfo");
+
   const answeredTbody = qs("answeredTbody");
 
   const prevBtn = qs("prev");
@@ -53,16 +56,11 @@
   function ensureViewer() {
     if (viewer === "A" || viewer === "B") return viewer;
 
-    // idiot-proof: only OK/CANCEL -> only A/B possible
-    const isA = confirm(
-      "Assign this device:\n\nOK = Player A\nCancel = Player B"
-    );
-
+    const isA = confirm("Assign this device:\n\nOK = Player A\nCancel = Player B");
     viewer = isA ? "A" : "B";
     window.Store.setViewer(viewer);
     return viewer;
   }
-
 
   function otherPlayer(p) {
     return p === "A" ? "B" : "A";
@@ -139,7 +137,64 @@
     return state.notes[qid];
   }
 
-  // Answered table
+  // Locks helpers
+  function getLockEntry(qid) {
+    const v = state.locks?.[qid];
+    if (!v || typeof v !== "object") {
+      return {
+        A: { locked: false, lockedAt: null },
+        B: { locked: false, lockedAt: null },
+      };
+    }
+
+    // support legacy {A:boolean,B:boolean}
+    if (typeof v.A === "boolean" || typeof v.B === "boolean") {
+      return {
+        A: { locked: !!v.A, lockedAt: null },
+        B: { locked: !!v.B, lockedAt: null },
+      };
+    }
+
+    const a = v.A && typeof v.A === "object" ? v.A : {};
+    const b = v.B && typeof v.B === "object" ? v.B : {};
+
+    return {
+      A: { locked: !!a.locked, lockedAt: typeof a.lockedAt === "number" ? a.lockedAt : null },
+      B: { locked: !!b.locked, lockedAt: typeof b.lockedAt === "number" ? b.lockedAt : null },
+    };
+  }
+
+  function ensureLockEntry(qid) {
+    if (!state.locks) state.locks = {};
+    const v = state.locks[qid];
+    if (!v || typeof v !== "object") {
+      state.locks[qid] = {
+        A: { locked: false, lockedAt: null },
+        B: { locked: false, lockedAt: null },
+      };
+      return state.locks[qid];
+    }
+
+    // upgrade legacy
+    if (typeof v.A === "boolean" || typeof v.B === "boolean") {
+      state.locks[qid] = {
+        A: { locked: !!v.A, lockedAt: null },
+        B: { locked: !!v.B, lockedAt: null },
+      };
+      return state.locks[qid];
+    }
+
+    // normalize
+    const cur = getLockEntry(qid);
+    state.locks[qid] = cur;
+    return cur;
+  }
+
+  function bothLocked(qid) {
+    const l = getLockEntry(qid);
+    return !!(l.A.locked && l.B.locked);
+  }
+
   function isAnswered(text) {
     return typeof text === "string" && text.trim().length > 0;
   }
@@ -153,6 +208,7 @@
       .replaceAll("'", "&#039;");
   }
 
+  // Answered table
   function renderAnsweredTable() {
     if (!answeredTbody) return;
 
@@ -162,9 +218,13 @@
     const rows = state.order.map((qid, i) => {
       const q = window.Utils.getQuestionById(questions, qid);
       const entry = getEntry(qid);
+      const locks = getLockEntry(qid);
 
-      const myOn = isAnswered(entry[me]);
-      const theirOn = isAnswered(entry[them]);
+      const myHasText = isAnswered(entry[me]);
+      const theirHasText = isAnswered(entry[them]);
+
+      const myLocked = !!locks[me].locked;
+      const theirLocked = !!locks[them].locked;
 
       const setNum = Math.floor(i / 12) + 1;
       const text = (q?.text || "").trim();
@@ -172,13 +232,16 @@
 
       const isCurrent = i === state.index ? "is-current" : "";
 
+      const myClass = myLocked ? "on" : (myHasText ? "draft" : "");
+      const theirClass = theirLocked ? "on" : (theirHasText ? "draft" : "");
+
       return `
         <tr class="${isCurrent}" data-idx="${i}">
           <td>${i + 1}</td>
           <td>${setNum}</td>
           <td class="qtext">${escapeHtml(short)}</td>
-          <td class="col-small"><span class="badge a ${myOn ? "on" : ""}"></span></td>
-          <td class="col-small"><span class="badge b ${theirOn ? "on" : ""}"></span></td>
+          <td class="col-small"><span class="badge a ${myClass}"></span></td>
+          <td class="col-small"><span class="badge b ${theirClass}"></span></td>
         </tr>
       `;
     });
@@ -196,10 +259,34 @@
     });
   }
 
+  function updateLockUi(qid) {
+    if (!lockBtn || !lockInfo) return;
+
+    const me = ensureViewer();
+    const locks = ensureLockEntry(qid);
+    const myLocked = !!locks[me].locked;
+    const reveal = bothLocked(qid);
+
+    myNote.readOnly = myLocked;
+    myNote.classList.toggle("is-locked", myLocked);
+
+    lockBtn.textContent = myLocked ? "Unlock (edit)" : "Lock my answer";
+    lockBtn.classList.toggle("is-locked", myLocked);
+
+    if (myLocked && !reveal) {
+      lockInfo.textContent = "Locked. Waiting for partner…";
+    } else if (myLocked && reveal) {
+      lockInfo.textContent = "Both locked ✅";
+    } else if (!myLocked && reveal) {
+      lockInfo.textContent = "Partner locked ✅ (lock yours to reveal)";
+    } else {
+      lockInfo.textContent = "";
+    }
+  }
+
   // Render
   function render() {
     ensureOrder();
-
     if (!state.order.length) return;
 
     if (state.index < 0) state.index = 0;
@@ -224,7 +311,17 @@
 
     const entry = getEntry(qid);
     myNote.value = entry[me] || "";
-    theirNote.value = entry[them] || "";
+
+    // Reveal logic: only show partner answer when BOTH locked for this question
+    if (bothLocked(qid)) {
+      theirNote.value = entry[them] || "";
+      theirNote.placeholder = "Partner's answer";
+    } else {
+      theirNote.value = "";
+      theirNote.placeholder = "Hidden until both of you lock your answers…";
+    }
+
+    updateLockUi(qid);
 
     renderAnsweredTable();
     save();
@@ -270,7 +367,7 @@
     render();
   }
 
-  // Merge import
+  // Merge import (notes)
   function mergeNotesIntoState(incomingNotes) {
     const inc = incomingNotes || {};
     state.notes = state.notes || {};
@@ -295,6 +392,49 @@
     });
   }
 
+  // Merge import (locks) - locked always wins
+  function mergeLocksIntoState(incomingLocks) {
+    const inc = incomingLocks || {};
+    state.locks = state.locks || {};
+
+    Object.keys(inc).forEach((qid) => {
+      const existing = getLockEntry(qid);
+      const incoming = inc[qid] || {};
+
+      // support legacy booleans
+      const inNorm =
+        (incoming && typeof incoming === "object" && (typeof incoming.A === "boolean" || typeof incoming.B === "boolean"))
+          ? {
+              A: { locked: !!incoming.A, lockedAt: null },
+              B: { locked: !!incoming.B, lockedAt: null },
+            }
+          : {
+              A: incoming.A && typeof incoming.A === "object"
+                ? { locked: !!incoming.A.locked, lockedAt: typeof incoming.A.lockedAt === "number" ? incoming.A.lockedAt : null }
+                : { locked: false, lockedAt: null },
+              B: incoming.B && typeof incoming.B === "object"
+                ? { locked: !!incoming.B.locked, lockedAt: typeof incoming.B.lockedAt === "number" ? incoming.B.lockedAt : null }
+                : { locked: false, lockedAt: null },
+            };
+
+      const pick = (side) => {
+        const e = existing[side];
+        const n = inNorm[side];
+        if (n.locked && !e.locked) return n;
+        if (n.locked && e.locked) {
+          const ea = typeof e.lockedAt === "number" ? e.lockedAt : null;
+          const na = typeof n.lockedAt === "number" ? n.lockedAt : null;
+          if (ea === null) return n;
+          if (na === null) return e;
+          return na < ea ? n : e;
+        }
+        return e;
+      };
+
+      state.locks[qid] = { A: pick("A"), B: pick("B") };
+    });
+  }
+
   // Events
   startBtn.addEventListener("click", startGame);
 
@@ -302,11 +442,46 @@
     ensureOrder();
     const me = ensureViewer();
     const qid = state.order[state.index];
+
+    // if locked, ignore typing
+    const locks = ensureLockEntry(qid);
+    if (locks[me].locked) return;
+
     const entry = ensureEntry(qid);
     entry[me] = myNote.value;
     save();
     renderAnsweredTable(); // cheap update
   });
+
+  if (lockBtn) {
+    lockBtn.addEventListener("click", () => {
+      ensureOrder();
+      const me = ensureViewer();
+      const qid = state.order[state.index];
+
+      const locks = ensureLockEntry(qid);
+      const entry = ensureEntry(qid);
+
+      // cannot lock empty (prevents dumb mistakes)
+      if (!locks[me].locked && !isAnswered(entry[me])) {
+        alert("Write something first, then lock it 🙂");
+        return;
+      }
+
+      if (!locks[me].locked) {
+        locks[me].locked = true;
+        locks[me].lockedAt = Date.now();
+      } else {
+        const ok = confirm("Unlock your answer for editing? This will hide answers again until both lock.");
+        if (!ok) return;
+        locks[me].locked = false;
+        locks[me].lockedAt = null;
+      }
+
+      save();
+      render();
+    });
+  }
 
   nextBtn.addEventListener("click", next);
   prevBtn.addEventListener("click", prev);
@@ -347,6 +522,7 @@
     }
 
     mergeNotesIntoState(payload.notes);
+    mergeLocksIntoState(payload.locks || {});
 
     // merge players too
     if (payload.players && typeof payload.players === "object") {
@@ -377,6 +553,7 @@
       if (!ok) return;
 
       mergeNotesIntoState(payload.notes);
+      mergeLocksIntoState(payload.locks || {});
 
       if (payload.players && typeof payload.players === "object") {
         state.players = state.players || { A: "", B: "" };

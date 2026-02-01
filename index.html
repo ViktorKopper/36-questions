@@ -5,8 +5,10 @@
   <title>36 Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- IMPORTANT: this must exist as /css/style.css -->
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/end.css" />
+  <link rel="stylesheet" href="./css/merge.css" />
 </head>
 <body>
 
@@ -78,6 +80,8 @@
         <button id="importBtn" class="btn btn-secondary">Import</button>
       </div>
 
+      <div id="mergeReport" class="merge-report hidden"></div>
+
       <p id="shareInfo" class="share-info"></p>
     </div>
 
@@ -99,7 +103,7 @@
               <th>Set</th>
               <th>Question</th>
               <th class="col-small">You</th>
-              <th class="col-small">Partner</th>
+              <th class="col-small">Her</th>
             </tr>
           </thead>
           <tbody id="answeredTbody"></tbody>
@@ -144,6 +148,18 @@
       <p class="end-hint">
         Tip: when saving as PDF, enable “Background graphics” in the print dialog so the hearts show up.
       </p>
+    </div>
+  </div>
+
+  <!-- CONFLICT MODAL -->
+  <div id="conflictModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" id="conflictModalBackdrop"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="conflictModalTitle">
+      <div class="modal-head">
+        <h3 id="conflictModalTitle">Resolve conflict</h3>
+        <button class="btn btn-ghost" id="conflictModalClose">Close</button>
+      </div>
+      <div class="modal-body" id="conflictModalBody"></div>
     </div>
   </div>
 

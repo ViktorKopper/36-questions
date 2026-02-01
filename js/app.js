@@ -64,6 +64,12 @@
   const howToBackdrop = qs("howToBackdrop");
   const howToClose = qs("howToClose");
 
+  const howMergeBtn = qs("howMergeBtn");
+  const howMergeModal = qs("howMergeModal");
+  const howMergeBackdrop = qs("howMergeBackdrop");
+  const howMergeClose = qs("howMergeClose");
+
+
 
   // State
   const state = window.Store.load();
@@ -618,6 +624,21 @@
   howToBtn?.addEventListener("click", openHowTo);
   howToBackdrop?.addEventListener("click", closeHowTo);
   howToClose?.addEventListener("click", closeHowTo);
+
+  function openHowMerge() {
+    howMergeModal.classList.remove("hidden");
+    howMergeModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeHowMerge() {
+    howMergeModal.classList.add("hidden");
+    howMergeModal.setAttribute("aria-hidden", "true");
+  }
+
+  howMergeBtn?.addEventListener("click", openHowMerge);
+  howMergeBackdrop?.addEventListener("click", closeHowMerge);
+  howMergeClose?.addEventListener("click", closeHowMerge);
+
 
 
   deviceRoleB?.addEventListener("click", () => {

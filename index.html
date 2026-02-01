@@ -86,6 +86,8 @@
         <button id="share" class="btn btn-secondary">Share Session</button>
         <button id="copyLink" class="btn btn-secondary">Copy Link</button>
         <button id="howToBtn" class="btn btn-ghost btn-mini">How to play</button>
+        <button id="howMergeBtn" class="btn btn-ghost btn-mini">How merging works</button>
+
 
       </div>
 
@@ -188,10 +190,10 @@
 
       <div class="glass-content">
         <ol class="howto-steps">
-          <li>Each of you answers privately on your own device ✍️</li>
+          <li>Each of us answers privately on your own device ✍️</li>
           <li>When ready, press <b>Lock my answer</b> 🔒</li>
           <li>Answers stay hidden until <b>both</b> are locked 👀</li>
-          <li>Use <b>Share / Copy Link</b> to sync with your partner 🔗</li>
+          <li>Use <b>Share / Copy Link</b> to sync  🔗</li>
           <li>If answers differ, resolve conflicts when importing ⚠️</li>
           <li>Finish all questions — or open <b>Conclusion</b> early (Player A) 🧾</li>
         </ol>
@@ -203,6 +205,75 @@
       </div>
     </div>
   </div>
+
+  <div id="howMergeModal" class="glass-modal hidden" aria-hidden="true">
+    <div class="glass-backdrop" id="howMergeBackdrop"></div>
+
+    <div class="glass-card">
+      <div class="glass-header">
+        <h2>How merging works 🧠</h2>
+        <button id="howMergeClose" class="btn btn-ghost">Close</button>
+      </div>
+
+      <div class="glass-content">
+        <h3 style="margin: 0 0 10px; opacity:.95;">Rules</h3>
+        <ol class="howto-steps">
+          <li>Your game lives only in your browser 💾</li>
+          <li>Import merges answers — it doesn’t blindly overwrite 🔄</li>
+          <li><b>Locked</b> answers have priority over unlocked 🔒</li>
+          <li>Empty fields may be auto-filled ✍️</li>
+          <li>If both sides wrote different text → <b>conflict</b> ⚠️</li>
+          <li>You choose: <b>Keep mine</b> or <b>Keep theirs</b> ✅</li>
+        </ol>
+
+        <h3 style="margin: 16px 0 10px; opacity:.95;">Examples</h3>
+
+        <div style="display:grid; gap:10px;">
+          <div style="padding:10px; border-radius:14px; background:rgba(0,0,0,.28); border:1px solid rgba(236,72,153,0.18);">
+            <div style="opacity:.85; font-weight:700; margin-bottom:6px;">1) Empty gets filled</div>
+            <div style="opacity:.85;">
+              <b>You:</b> (empty) <br/>
+              <b>Partner:</b> “I miss you when you’re quiet.” <br/>
+              ✅ Result: your empty field is filled with partner’s answer (no conflict).
+            </div>
+          </div>
+
+          <div style="padding:10px; border-radius:14px; background:rgba(0,0,0,.28); border:1px solid rgba(236,72,153,0.18);">
+            <div style="opacity:.85; font-weight:700; margin-bottom:6px;">2) Locked wins over unlocked</div>
+            <div style="opacity:.85;">
+              <b>You (locked):</b> “Beach + sunset + no phone.” <br/>
+              <b>Partner (unlocked):</b> “Mountains + coffee.” <br/>
+              ✅ Result: locked answer stays. (No overwrite by unlocked.)
+            </div>
+          </div>
+
+          <div style="padding:10px; border-radius:14px; background:rgba(0,0,0,.28); border:1px solid rgba(236,72,153,0.18);">
+            <div style="opacity:.85; font-weight:700; margin-bottom:6px;">3) Both wrote different text (unlocked)</div>
+            <div style="opacity:.85;">
+              <b>You:</b> “I want more honesty.” <br/>
+              <b>Partner:</b> “I want more patience.” <br/>
+              ⚠ Result: conflict appears → you choose which to keep.
+            </div>
+          </div>
+
+          <div style="padding:10px; border-radius:14px; background:rgba(0,0,0,.28); border:1px solid rgba(236,72,153,0.18);">
+            <div style="opacity:.85; font-weight:700; margin-bottom:6px;">4) Both locked but different</div>
+            <div style="opacity:.85;">
+              <b>You (locked):</b> “My perfect day is calm at home.” <br/>
+              <b>Partner (locked):</b> “My perfect day is exploring a city.” <br/>
+              ⚠ Result: conflict appears (because both are locked but different) → you choose.
+            </div>
+          </div>
+        </div>
+
+        <p class="howto-note">
+          💡 Tip: Conflicts are normal when both of you answer offline.
+          Nothing is deleted without you choosing.
+        </p>
+      </div>
+    </div>
+  </div>
+
 
 
   <!-- Order matters -->

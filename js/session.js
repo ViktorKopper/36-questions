@@ -1,5 +1,15 @@
-// URL session (share/join) + merge
+// URL session (share/join) + robust merge (per question, per side)
 (function () {
+  function normStr(v) {
+    return typeof v === "string" ? v : "";
+  }
+  function cleanStr(s) {
+    return normStr(s).replace(/\r\n/g, "\n").trim();
+  }
+  function sameText(a, b) {
+    return cleanStr(a) === cleanStr(b);
+  }
+
   function normalizeNotes(notes) {
     const out = (notes && typeof notes === "object") ? notes : {};
     Object.keys(out).forEach((qid) => {
@@ -49,50 +59,160 @@
     return out;
   }
 
-  function mergeNotes(existingNotes, incomingNotes) {
-    const ex = normalizeNotes(existingNotes);
-    const inc = normalizeNotes(incomingNotes);
-
-    Object.keys(inc).forEach((qid) => {
-      const a = inc[qid].A || (ex[qid] ? ex[qid].A : "");
-      const b = inc[qid].B || (ex[qid] ? ex[qid].B : "");
-      ex[qid] = { A: a, B: b };
-    });
-
-    return ex;
+  function normalizePayload(payload) {
+    const p = (payload && typeof payload === "object") ? payload : {};
+    return {
+      index: typeof p.index === "number" ? p.index : null,
+      player: (p.player === "A" || p.player === "B") ? p.player : null,
+      players: (p.players && typeof p.players === "object") ? p.players : null,
+      order: Array.isArray(p.order) ? p.order : null,
+      notes: normalizeNotes(p.notes),
+      locks: normalizeLocks(p.locks),
+    };
   }
 
-  // Locked always wins (true beats false). Keep earliest lockedAt if present.
-  function mergeLocks(existingLocks, incomingLocks) {
-    const ex = normalizeLocks(existingLocks);
-    const inc = normalizeLocks(incomingLocks);
+  function pickByLockedAt(localSide, incomingSide) {
+    // both locked & different -> choose earlier lockedAt
+    const l = localSide || { locked: false, lockedAt: null };
+    const r = incomingSide || { locked: false, lockedAt: null };
 
-    Object.keys(inc).forEach((qid) => {
-      const exq = ex[qid] || {
-        A: { locked: false, lockedAt: null },
-        B: { locked: false, lockedAt: null },
+    const la = typeof l.lockedAt === "number" ? l.lockedAt : null;
+    const ra = typeof r.lockedAt === "number" ? r.lockedAt : null;
+
+    if (la === null && ra === null) return "local"; // can't decide -> keep local
+    if (la === null) return "incoming";
+    if (ra === null) return "local";
+    return ra < la ? "incoming" : "local";
+  }
+
+  /**
+   * Merge incoming payload into existing state (mutates state).
+   * Returns report: { merged: true, conflicts: [...], applied: {lockedWins, filledEmpties} }
+   */
+  function mergeIntoState(state, incomingPayload) {
+    const report = {
+      merged: false,
+      conflicts: [],
+      applied: { lockedWins: 0, filledEmpties: 0 },
+    };
+
+    if (!state || typeof state !== "object") return report;
+
+    const inc = normalizePayload(incomingPayload);
+    state.notes = normalizeNotes(state.notes || {});
+    state.locks = normalizeLocks(state.locks || {});
+    state.players = (state.players && typeof state.players === "object") ? state.players : { A: "", B: "" };
+    state.order = Array.isArray(state.order) ? state.order : [];
+
+    // players: only fill missing
+    if (inc.players) {
+      if (!state.players.A) state.players.A = normStr(inc.players.A);
+      if (!state.players.B) state.players.B = normStr(inc.players.B);
+    }
+
+    // order: set only if local missing
+    if ((!state.order || !state.order.length) && inc.order && inc.order.length) {
+      state.order = inc.order;
+    }
+
+    // Merge qids union
+    const qids = new Set([
+      ...Object.keys(state.notes || {}),
+      ...Object.keys(inc.notes || {}),
+      ...Object.keys(state.locks || {}),
+      ...Object.keys(inc.locks || {}),
+    ]);
+
+    const sides = ["A", "B"];
+
+    qids.forEach((qid) => {
+      const exN = state.notes[qid] || { A: "", B: "" };
+      const inN = inc.notes[qid] || { A: "", B: "" };
+
+      const exL = state.locks[qid] || { A: { locked: false, lockedAt: null }, B: { locked: false, lockedAt: null } };
+      const inL = inc.locks[qid] || { A: { locked: false, lockedAt: null }, B: { locked: false, lockedAt: null } };
+
+      const outN = { A: normStr(exN.A), B: normStr(exN.B) };
+      const outL = {
+        A: { locked: !!exL.A?.locked, lockedAt: typeof exL.A?.lockedAt === "number" ? exL.A.lockedAt : null },
+        B: { locked: !!exL.B?.locked, lockedAt: typeof exL.B?.lockedAt === "number" ? exL.B.lockedAt : null },
       };
-      const inq = inc[qid];
 
-      const pick = (side) => {
-        const e = exq[side] || { locked: false, lockedAt: null };
-        const n = inq[side] || { locked: false, lockedAt: null };
+      sides.forEach((side) => {
+        const localLocked = !!outL[side].locked;
+        const incomingLocked = !!inL[side]?.locked;
 
-        if (n.locked && !e.locked) return n;
-        if (n.locked && e.locked) {
-          const ea = typeof e.lockedAt === "number" ? e.lockedAt : null;
-          const na = typeof n.lockedAt === "number" ? n.lockedAt : null;
-          if (ea === null) return n;
-          if (na === null) return e;
-          return na < ea ? n : e;
+        const localText = normStr(outN[side]);
+        const incomingText = normStr(inN[side]);
+
+        // 1) LOCK WINS
+        if (incomingLocked && !localLocked) {
+          outN[side] = incomingText || localText; // if incoming has no text, keep local text
+          outL[side] = {
+            locked: true,
+            lockedAt: typeof inL[side]?.lockedAt === "number" ? inL[side].lockedAt : outL[side].lockedAt,
+          };
+          report.applied.lockedWins += 1;
+          return;
         }
-        return e;
-      };
 
-      ex[qid] = { A: pick("A"), B: pick("B") };
+        // both locked
+        if (incomingLocked && localLocked) {
+          if (!sameText(localText, incomingText) && (cleanStr(localText) || cleanStr(incomingText))) {
+            const winner = pickByLockedAt(outL[side], inL[side]);
+            if (winner === "incoming") {
+              report.conflicts.push({
+                qid,
+                side,
+                type: "both_locked_different",
+                kept: "incoming",
+              });
+              outN[side] = incomingText;
+              outL[side] = {
+                locked: true,
+                lockedAt: typeof inL[side]?.lockedAt === "number" ? inL[side].lockedAt : outL[side].lockedAt,
+              };
+            } else {
+              report.conflicts.push({
+                qid,
+                side,
+                type: "both_locked_different",
+                kept: "local",
+              });
+              // keep local
+            }
+          }
+          return;
+        }
+
+        // 2) Not locked: fill empty only, don't overwrite content
+        if (!localLocked) {
+          if (!cleanStr(localText) && cleanStr(incomingText)) {
+            outN[side] = incomingText;
+            report.applied.filledEmpties += 1;
+          } else if (cleanStr(localText) && cleanStr(incomingText) && !sameText(localText, incomingText)) {
+            report.conflicts.push({
+              qid,
+              side,
+              type: "both_unlocked_different",
+              kept: "local",
+            });
+          }
+        }
+
+        // locks: keep local unless incoming is locked (handled above)
+        // (optional) we can copy lockedAt if local is null and incoming has it, but only if local is locked
+        if (outL[side].locked && outL[side].lockedAt === null && typeof inL[side]?.lockedAt === "number") {
+          outL[side].lockedAt = inL[side].lockedAt;
+        }
+      });
+
+      state.notes[qid] = outN;
+      state.locks[qid] = outL;
     });
 
-    return ex;
+    report.merged = true;
+    return report;
   }
 
   // Accept both old "#session=" and new "#s="
@@ -110,25 +230,19 @@
     try {
       const payload = window.Utils.decodeSession(token);
 
-      state.index = typeof payload.index === "number" ? payload.index : state.index;
-      state.player = (payload.player === "A" || payload.player === "B") ? payload.player : state.player;
+      // index/player from URL are optional; don't destroy local navigation unless it's clean
+      if (typeof payload.index === "number") state.index = payload.index;
+      if (payload.player === "A" || payload.player === "B") state.player = payload.player;
 
-      if (payload.players && typeof payload.players === "object") {
-        state.players = state.players || { A: "", B: "" };
-        state.players.A = payload.players.A || state.players.A;
-        state.players.B = payload.players.B || state.players.B;
-      }
-
-      if (Array.isArray(payload.order) && payload.order.length) {
-        state.order = payload.order;
-      }
-
-      state.notes = mergeNotes(state.notes || {}, payload.notes || {});
-      state.locks = mergeLocks(state.locks || {}, payload.locks || {});
+      const report = mergeIntoState(state, payload);
 
       const migrated = window.Store.migrateState(state);
       Object.keys(migrated).forEach((k) => (state[k] = migrated[k]));
       window.Store.save(state);
+
+      // optional: log merge report (no alerts on page load)
+      if (report?.conflicts?.length) console.warn("Session URL merge conflicts:", report.conflicts);
+
       return true;
     } catch (e) {
       console.error("Failed to load session from URL", e);
@@ -165,5 +279,6 @@
     tryLoadFromUrl,
     buildSessionUrl,
     decodePayloadFromUrl,
+    mergeIntoState, // <-- use this in Import button
   };
 })();

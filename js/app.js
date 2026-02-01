@@ -455,18 +455,40 @@
     if (!url) return;
 
     const payload = window.Session.decodePayloadFromUrl(url);
-    if (!payload || !payload.notes) {
+    if (!payload) {
       alert("Invalid link. Paste the full session link with #s=...");
       return;
     }
 
-    // Let your existing Session/Store logic handle details
-    // If your session.js already merges, this still works:
-    state.notes = payload.notes || state.notes;
-    state.locks = payload.locks || state.locks;
-    state.players = payload.players || state.players;
+    if (!window.Session.mergeIntoState) {
+      alert("Merge function missing. session.js not updated?");
+      return;
+    }
 
+    const report = window.Session.mergeIntoState(state, payload);
     save();
+
+    // Summary for human sanity
+    const c = report?.conflicts?.length || 0;
+    const lw = report?.applied?.lockedWins || 0;
+    const fe = report?.applied?.filledEmpties || 0;
+
+    if (c > 0) {
+      alert(
+        `Imported & merged ✅\n\n` +
+        `Locked wins applied: ${lw}\n` +
+        `Filled empty answers: ${fe}\n\n` +
+        `Conflicts: ${c}\n` +
+        `→ Kept local answers in unlocked conflicts.\n` +
+        `→ In locked-vs-locked conflicts, kept earlier lockedAt.\n\n` +
+        `Open console for details.`
+      );
+      console.warn("Merge conflicts:", report.conflicts);
+    } else {
+      alert(`Imported & merged ✅\n\nLocked wins: ${lw}\nFilled empties: ${fe}\nNo conflicts.`);
+    }
+
+    // refresh UI without nuking hash
     history.replaceState(null, "", location.pathname + location.search);
     location.reload();
   });

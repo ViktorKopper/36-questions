@@ -166,6 +166,10 @@
                 side,
                 type: "both_locked_different",
                 kept: "incoming",
+                localText,
+                incomingText,
+                localLock: { locked: true, lockedAt: outL[side].lockedAt },
+                incomingLock: { locked: true, lockedAt: (typeof inL[side]?.lockedAt === "number" ? inL[side].lockedAt : null) },
               });
               outN[side] = incomingText;
               outL[side] = {
@@ -178,6 +182,10 @@
                 side,
                 type: "both_locked_different",
                 kept: "local",
+                localText,
+                incomingText,
+                localLock: { locked: true, lockedAt: outL[side].lockedAt },
+                incomingLock: { locked: true, lockedAt: (typeof inL[side]?.lockedAt === "number" ? inL[side].lockedAt : null) },
               });
               // keep local
             }
@@ -196,6 +204,10 @@
               side,
               type: "both_unlocked_different",
               kept: "local",
+              localText,
+              incomingText,
+              localLock: { locked: false, lockedAt: null },
+              incomingLock: { locked: false, lockedAt: null },
             });
           }
         }

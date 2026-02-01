@@ -45,6 +45,14 @@
   const importLink = qs("importLink");
   const importBtn = qs("importBtn");
 
+  // Merge UI
+  const mergeReportEl = qs("mergeReport");
+  const conflictModal = qs("conflictModal");
+  const conflictModalBackdrop = qs("conflictModalBackdrop");
+  const conflictModalClose = qs("conflictModalClose");
+  const conflictModalBody = qs("conflictModalBody");
+
+
   // State
   const state = window.Store.load();
   const save = () => window.Store.save(state);
@@ -91,6 +99,40 @@
     if (url) shareInfo.dataset.link = url;
   }
 
+  // Merge UI helpers
+  function esc(s) {
+    return String(s || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function shortPreview(s, max = 220) {
+    const t = String(s || "").trim();
+    if (t.length <= max) return t;
+    return t.slice(0, max) + "…";
+  }
+
+  function openConflictModal(html) {
+    if (!conflictModal || !conflictModalBody) return;
+    conflictModalBody.innerHTML = html;
+    conflictModal.classList.remove("hidden");
+    conflictModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeConflictModal() {
+    if (!conflictModal || !conflictModalBody) return;
+    conflictModal.classList.add("hidden");
+    conflictModal.setAttribute("aria-hidden", "true");
+    conflictModalBody.innerHTML = "";
+  }
+
+  conflictModalBackdrop?.addEventListener("click", closeConflictModal);
+  conflictModalClose?.addEventListener("click", closeConflictModal);
+
+
   // Order of questions
   function ensureOrder() {
     if (Array.isArray(state.order) && state.order.length === questions.length) return;
@@ -105,6 +147,156 @@
       ...window.Utils.shuffle(set3),
     ];
   }
+
+  function qidToNumber(qid) {
+    ensureOrder();
+    const i = state.order.indexOf(qid);
+    return i >= 0 ? i + 1 : "?";
+  }
+
+  function applyConflictResolution(conflict, choice) {
+    const { qid, side } = conflict;
+    state.notes = state.notes || {};
+    state.locks = state.locks || {};
+
+    if (!state.notes[qid]) state.notes[qid] = { A: "", B: "" };
+    if (!state.locks[qid]) state.locks[qid] = { A: { locked: false, lockedAt: null }, B: { locked: false, lockedAt: null } };
+
+    if (choice === "incoming") {
+      state.notes[qid][side] = conflict.incomingText || "";
+      if (conflict.type === "both_locked_different") {
+        state.locks[qid][side] = {
+          locked: true,
+          lockedAt: (typeof conflict.incomingLock?.lockedAt === "number" ? conflict.incomingLock.lockedAt : state.locks[qid][side].lockedAt),
+        };
+      }
+    } else {
+      state.notes[qid][side] = conflict.localText || "";
+      if (conflict.type === "both_locked_different") {
+        state.locks[qid][side] = {
+          locked: true,
+          lockedAt: (typeof conflict.localLock?.lockedAt === "number" ? conflict.localLock.lockedAt : state.locks[qid][side].lockedAt),
+        };
+      }
+    }
+  }
+
+  function renderMergeReport(report) {
+    if (!mergeReportEl) return;
+
+    if (!report || report.merged !== true) {
+      mergeReportEl.classList.add("hidden");
+      mergeReportEl.innerHTML = "";
+      return;
+    }
+
+    const c = report.conflicts?.length || 0;
+    const lw = report.applied?.lockedWins || 0;
+    const fe = report.applied?.filledEmpties || 0;
+
+    mergeReportEl.classList.remove("hidden");
+    mergeReportEl.classList.toggle("ok", c === 0);
+    mergeReportEl.classList.toggle("warn", c > 0);
+
+    const badgeClass = c === 0 ? "ok" : "warn";
+    const badgeText = c === 0 ? "No conflicts" : `${c} conflict(s)`;
+
+    const conflictsHtml = (report.conflicts || []).map((x, idx) => {
+      const sideName = x.side === "A" ? (state.players?.A || "You") : (state.players?.B || "Partner");
+      const typeLabel = x.type === "both_locked_different"
+        ? "Both locked (different text)"
+        : "Both written (unlocked, different text)";
+
+      return `
+        <div class="conflict-item" data-idx="${idx}">
+          <div class="conflict-top">
+            <div class="conflict-meta">
+              <b>#${qidToNumber(x.qid)}</b> • side: <b>${esc(sideName)}</b><br/>
+              <span style="opacity:.8">${esc(typeLabel)}</span>
+            </div>
+            <div class="conflict-actions">
+              <button class="btn btn-secondary btn-mini" data-action="details" data-idx="${idx}">Details</button>
+              <button class="btn btn-secondary btn-mini" data-action="keepLocal" data-idx="${idx}">Keep mine</button>
+              <button class="btn btn-primary btn-mini" data-action="keepIncoming" data-idx="${idx}">Keep theirs</button>
+            </div>
+          </div>
+
+          <div class="conflict-preview">
+            <div class="preview-box">
+              <div class="preview-title">Local (current)</div>
+              ${esc(shortPreview(x.localText))}
+            </div>
+            <div class="preview-box">
+              <div class="preview-title">Incoming (imported)</div>
+              ${esc(shortPreview(x.incomingText))}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    mergeReportEl.innerHTML = `
+      <div class="merge-title">
+        <h3>Import merge report</h3>
+        <span class="badge ${badgeClass}">${esc(badgeText)}</span>
+      </div>
+      <div class="merge-summary">
+        Locked wins applied: <b>${lw}</b> • Filled empty answers: <b>${fe}</b>
+        ${c ? "<br/>Resolve conflicts below (recommended)." : ""}
+      </div>
+      ${c ? `<div class="merge-conflicts">${conflictsHtml}</div>` : ""}
+    `;
+
+    mergeReportEl.onclick = (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const action = btn.getAttribute("data-action");
+      const idx = Number(btn.getAttribute("data-idx"));
+      const conflict = report.conflicts[idx];
+      if (!conflict) return;
+
+      if (action === "details") {
+        openConflictModal(`
+          <div style="opacity:.9; margin-bottom:10px;">
+            <b>Question #${esc(qidToNumber(conflict.qid))}</b> • side: <b>${esc(conflict.side)}</b><br/>
+            type: <b>${esc(conflict.type)}</b>
+          </div>
+          <div class="conflict-preview">
+            <div class="preview-box">
+              <div class="preview-title">Local</div>
+              ${esc(conflict.localText)}
+            </div>
+            <div class="preview-box">
+              <div class="preview-title">Incoming</div>
+              ${esc(conflict.incomingText)}
+            </div>
+          </div>
+        `);
+        return;
+      }
+
+      if (action === "keepLocal") {
+        applyConflictResolution(conflict, "local");
+        report.conflicts.splice(idx, 1);
+        state.mergeReport = report;
+        save();
+        render();
+        renderMergeReport(report);
+        return;
+      }
+
+      if (action === "keepIncoming") {
+        applyConflictResolution(conflict, "incoming");
+        report.conflicts.splice(idx, 1);
+        state.mergeReport = report;
+        save();
+        render();
+        renderMergeReport(report);
+        return;
+      }
+    };
+  }
+
 
   function toggleTurn() {
     state.player = state.player === "A" ? "B" : "A";
@@ -337,6 +529,7 @@
 
     updateLockUi(qid);
     renderAnsweredTable();
+    renderMergeReport(state.mergeReport);
     save();
   }
 
@@ -466,32 +659,17 @@
     }
 
     const report = window.Session.mergeIntoState(state, payload);
+    state.mergeReport = report;
     save();
 
-    // Summary for human sanity
-    const c = report?.conflicts?.length || 0;
-    const lw = report?.applied?.lockedWins || 0;
-    const fe = report?.applied?.filledEmpties || 0;
+    // Update UI (no reload needed)
+    render();
+    renderMergeReport(report);
 
-    if (c > 0) {
-      alert(
-        `Imported & merged ✅\n\n` +
-        `Locked wins applied: ${lw}\n` +
-        `Filled empty answers: ${fe}\n\n` +
-        `Conflicts: ${c}\n` +
-        `→ Kept local answers in unlocked conflicts.\n` +
-        `→ In locked-vs-locked conflicts, kept earlier lockedAt.\n\n` +
-        `Open console for details.`
-      );
-      console.warn("Merge conflicts:", report.conflicts);
-    } else {
-      alert(`Imported & merged ✅\n\nLocked wins: ${lw}\nFilled empties: ${fe}\nNo conflicts.`);
-    }
-
-    // refresh UI without nuking hash
+    // Optional: clear hash so you don't accidentally re-merge on refresh
     history.replaceState(null, "", location.pathname + location.search);
-    location.reload();
   });
+
 
   // Init
   if (state.players?.A && state.players?.B) showGameScreen();

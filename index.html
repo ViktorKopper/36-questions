@@ -15,6 +15,40 @@
   <!-- HEARTS BACKGROUND -->
   <div id="hearts-bg"></div>
 
+   <!-- PLAYER PICK-->
+  <div id="role-screen" class="role-screen hidden">
+    <div class="role-shell">
+      <h1 class="role-title">💗 36 Questions</h1>
+
+      <h2>Who are you in this session?</h2>
+      <p class="role-sub">
+        Choose your role before you begin.<br/>
+        Each role sees and unlocks answers differently.
+      </p>
+
+      <div class="role-cards">
+        <button class="role-card role-a" data-role="A">
+          <div class="role-heart">💖</div>
+          <h3>I’m Player A</h3>
+          <p>Starts the session and answers first.</p>
+        </button>
+
+        <button class="role-card role-b" data-role="B">
+          <div class="role-heart">💜</div>
+          <h3>I’m Player B</h3>
+          <p>Joins the session and responds after.</p>
+        </button>
+      </div>
+
+      <div class="role-warning">⚠️ This choice is permanent for this session.</div>
+
+      <button id="roleContinue" class="btn btn-primary" disabled>
+        Continue →
+      </button>
+    </div>
+  </div>
+
+
   <!-- START SCREEN -->
   <div id="start-screen" class="start-screen">
     <h1>36 Questions</h1>

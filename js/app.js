@@ -69,6 +69,11 @@
   const howMergeBackdrop = qs("howMergeBackdrop");
   const howMergeClose = qs("howMergeClose");
 
+  const roleScreen = qs("role-screen");
+  const roleCards = document.querySelectorAll(".role-card");
+  const roleContinue = qs("roleContinue");
+
+
 
 
   // State
@@ -89,11 +94,11 @@
   const revealedMemory = {}; // qid -> boolean (not stored)
 
   function ensureViewer() {
-    if (viewer === "A" || viewer === "B") return viewer;
+    /*if (viewer === "A" || viewer === "B") return viewer;
 
     const isA = confirm("Assign this device:\n\nOK = Player A\nCancel = Player B");
     viewer = isA ? "A" : "B";
-    window.Store.setViewer(viewer);
+    window.Store.setViewer(viewer);*/
     return viewer;
   }
 
@@ -781,8 +786,36 @@
 
 
   // Init
-  if (state.players?.A && state.players?.B) showGameScreen();
-  else showStartScreen();
+  let selectedRole = null;
 
-  render();
+  roleCards.forEach(card => {
+    card.addEventListener("click", () => {
+      roleCards.forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedRole = card.dataset.role;
+      roleContinue.disabled = false;
+    });
+  });
+
+  roleContinue.addEventListener("click", () => {
+    if (!selectedRole) return;
+    viewer = selectedRole;
+    window.Store.setViewer(viewer);
+
+    roleScreen.classList.add("hidden");
+    showStartScreen(); // existing start screen (names)
+  });
+
+  viewer = window.Store.getViewer();
+
+  if (!viewer) {
+    roleScreen.classList.remove("hidden");
+    startScreen.classList.add("hidden");
+    appScreen.classList.add("hidden");
+  } else if (state.players?.A && state.players?.B) {
+    showGameScreen();
+    render();
+  } else {
+    showStartScreen();
+  }
 })();

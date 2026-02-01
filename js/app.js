@@ -35,6 +35,8 @@
   const prevBtn = qs("prev");
   const nextBtn = qs("next");
   const resetBtn = qs("reset");
+  const finishBtn = qs("finishBtn");
+
 
   const shareBtn = qs("share");
   const copyBtn = qs("copyLink");
@@ -52,6 +54,10 @@
 
   // Viewer: which device is A/B
   let viewer = window.Store.getViewer();
+  if (window.EndGame && typeof window.EndGame.bind === "function") {
+    window.EndGame.bind(() => state);
+  }
+
 
   // runtime-only memory to animate reveal once per question
   const revealedMemory = {}; // qid -> boolean (not stored)
@@ -193,6 +199,12 @@
     return !!(l.A.locked && l.B.locked);
   }
 
+  function isCompleteGame() {
+    ensureOrder();
+    return state.order.every((qid) => bothLocked(qid));
+  }
+
+
   function isAnswered(text) {
     return typeof text === "string" && text.trim().length > 0;
   }
@@ -251,6 +263,9 @@
         const idx = Number(tr.getAttribute("data-idx"));
         if (Number.isNaN(idx)) return;
         state.index = Math.max(0, Math.min(idx, state.order.length - 1));
+        if (finishBtn) {
+          finishBtn.classList.toggle("hidden", !isCompleteGame());
+        }
         save();
         render();
       });
@@ -404,6 +419,11 @@
       save();
       render();
     }
+  });
+
+  finishBtn?.addEventListener("click", () => {
+    if (!window.EndGame) return;
+    window.EndGame.open(state);
   });
 
   resetBtn.addEventListener("click", () => {

@@ -5,8 +5,8 @@
   <title>36 Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- IMPORTANT: this must exist as /css/style.css -->
   <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/end.css" />
 </head>
 <body>
 
@@ -64,6 +64,7 @@
       <div class="controls">
         <button id="prev" class="btn btn-secondary">Previous</button>
         <button id="next" class="btn btn-primary">Next</button>
+        <button id="finishBtn" class="btn btn-secondary hidden">Conclusion</button>
         <button id="reset" class="btn btn-ghost">Reset</button>
       </div>
 
@@ -108,12 +109,53 @@
 
   </div>
 
-  <!-- Order matters: utils BEFORE app -->
+  <!-- END / CONCLUSION SCREEN -->
+  <div id="end-screen" class="end-screen hidden">
+    <div class="end-panel">
+      <div class="end-head">
+        <div>
+          <h1 class="end-title">Conclusion</h1>
+          <p class="end-subtitle" id="endSubtitle">Your answers side-by-side.</p>
+        </div>
+
+        <div class="end-actions">
+          <button id="endBackBtn" class="btn btn-secondary">Back to game</button>
+          <button id="exportPdfBtn" class="btn btn-primary">Export PDF</button>
+          <button id="endResetBtn" class="btn btn-ghost">Reset</button>
+        </div>
+      </div>
+
+      <div class="end-stats" id="endStats"></div>
+
+      <div class="end-filters">
+        <label class="chip">
+          <input type="checkbox" id="onlyBothLocked" checked />
+          <span>Only fully revealed (both locked)</span>
+        </label>
+
+        <label class="chip">
+          <input type="checkbox" id="includeQuestions" checked />
+          <span>Include question text</span>
+        </label>
+      </div>
+
+      <div id="comparisonList" class="comparison-list"></div>
+
+      <p class="end-hint">
+        Tip: when saving as PDF, enable “Background graphics” in the print dialog so the hearts show up.
+      </p>
+    </div>
+  </div>
+
+  <!-- Order matters -->
   <script src="./js/questions.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/store.js"></script>
   <script src="./js/session.js"></script>
   <script src="./js/hearts.js"></script>
+
+  <script src="./js/pdf-export.js"></script>
+  <script src="./js/endgame.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

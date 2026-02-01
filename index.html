@@ -2,67 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>36 Questions</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- HEARTS BACKGROUND -->
   <div id="hearts-bg"></div>
 
   <!-- START SCREEN -->
-  <div id="start-screen" class="start-screen">
+  <div class="start-screen">
     <h1>36 Questions</h1>
-    <p class="subtitle">Enter player names to begin</p>
+    <p class="subtitle">A game to fall deeper</p>
 
-    <input id="playerAInput" type="text" placeholder="Player A name" autocomplete="off" />
-    <input id="playerBInput" type="text" placeholder="Player B name" autocomplete="off" />
-
-    <button id="startGame" class="btn btn-primary">Start Game</button>
+    <input id="nameInput" placeholder="Your name" />
+    <button id="startBtn" class="btn btn-primary">Start</button>
   </div>
 
-  <!-- GAME SCREEN -->
-  <div class="app hidden">
-    <h1>36 Questions</h1>
+  <!-- GAME SCREEN (2 PANELS) -->
+  <div id="game-layout" class="game-layout hidden">
 
-    <div class="meta">
-      <span id="set"></span>
+    <!-- LEFT: MAIN GAME -->
+    <div class="app">
+      <h1>36 Questions</h1>
 
-      <div class="progress-wrap" aria-label="Game progress">
-        <div
-          class="progress-bar"
-          role="progressbar"
-          aria-valuemin="0"
-          aria-valuemax="36"
-          aria-valuenow="1"
-        >
-          <div class="progress-fill" id="progressFill"></div>
+      <div class="meta">
+        <span id="set"></span>
+
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-label" id="progressLabel"></div>
         </div>
-        <div class="progress-label" id="progressLabel">Question 1 / 36</div>
+
+        <span id="player"></span>
       </div>
 
-      <span id="player"></span>
-    </div>
-
-    <div class="card">
-      <p id="question"></p>
-    </div>
-
-    <!-- Two answers (you + partner) -->
-    <div class="answers">
-      <label class="answer-label" id="myAnswerLabel">Your answer</label>
-      <textarea id="myNote" placeholder="Write your answer..."></textarea>
-
-      <div class="lock-row">
-        <button id="lockBtn" class="btn btn-secondary">Lock my answer</button>
-        <span id="lockInfo" class="lock-info"></span>
+      <div class="card">
+        <p id="question"></p>
       </div>
 
-      <label class="answer-label" id="theirAnswerLabel">Partner's answer</label>
-      <textarea id="theirNote" placeholder="Partner's answer will appear here..." readonly></textarea>
+      <div class="answers">
+        <label class="answer-label">Your answer</label>
+        <textarea id="myNote" placeholder="Write your answer..."></textarea>
+
+        <div class="lock-row">
+          <button id="lockBtn" class="btn btn-secondary">Lock my answer</button>
+          <span id="lockInfo" class="lock-info"></span>
+        </div>
+
+        <label class="answer-label">Partner's answer</label>
+        <textarea id="theirNote" readonly placeholder="Waiting for partner..."></textarea>
+      </div>
+
+      <div class="controls">
+        <button id="prev" class="btn btn-secondary">Previous</button>
+        <button id="next" class="btn btn-primary">Next</button>
+        <button id="reset" class="btn btn-ghost">Reset</button>
+      </div>
+
+      <div class="controls">
+        <button id="share" class="btn btn-secondary">Share Session</button>
+        <button id="copyLink" class="btn btn-secondary">Copy Link</button>
+      </div>
+
+      <div class="controls">
+        <input id="importLink" placeholder="Paste partner link here..." />
+        <button id="importBtn" class="btn btn-secondary">Import</button>
+      </div>
+
+      <p id="shareInfo" class="share-info"></p>
     </div>
 
-    <!-- Answered table -->
-    <div class="answered-wrap">
+    <!-- RIGHT: ANSWERED QUESTIONS -->
+    <aside class="answered-panel">
       <div class="answered-head">
         <h2 class="answered-title">Answered questions</h2>
         <div class="answered-legend">
@@ -72,49 +88,28 @@
       </div>
 
       <div class="answered-table-wrap">
-        <table class="answered-table" id="answeredTable">
+        <table class="answered-table">
           <thead>
             <tr>
               <th>#</th>
               <th>Set</th>
               <th>Question</th>
-              <th class="col-small">You</th>
-              <th class="col-small">Her</th>
+              <th>You</th>
+              <th>Her</th>
             </tr>
           </thead>
           <tbody id="answeredTbody"></tbody>
         </table>
       </div>
-    </div>
+    </aside>
 
-    <!-- Main navigation -->
-    <div class="controls">
-      <button id="prev" class="btn btn-secondary">Previous</button>
-      <button id="next" class="btn btn-primary">Next</button>
-      <button id="reset" class="btn btn-ghost">Reset</button>
-    </div>
-
-    <!-- Multiplayer / Share -->
-    <div class="controls">
-      <button id="share" class="btn btn-secondary">Share Session</button>
-      <button id="copyLink" class="btn btn-secondary">Copy Link</button>
-    </div>
-
-    <!-- Import partner link -->
-    <div class="controls">
-      <input id="importLink" type="text" placeholder="Paste partner link here..." />
-      <button id="importBtn" class="btn btn-secondary">Import & Sync</button>
-    </div>
-
-    <p id="shareInfo" class="share-info"></p>
   </div>
 
-  <!-- Scripts (non-module) -->
-  <script src="js/questions.js"></script>
-  <script src="js/hearts.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/store.js"></script>
-  <script src="js/session.js"></script>
-  <script src="js/app.js"></script>
+  <script src="questions.js"></script>
+  <script src="store.js"></script>
+  <script src="session.js"></script>
+  <script src="utils.js"></script>
+  <script src="hearts.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

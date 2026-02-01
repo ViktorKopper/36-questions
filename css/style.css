@@ -1,1008 +1,228 @@
-/* ================================
-   Pink on Black – Couple Game Theme
-   ================================ */
+:root{
+  --pink:#ec4899;
+  --pink-dark:#be185d;
+  --text:#fbcfe8;
+  --bg:#000;
+  --glass:
+    radial-gradient(120% 90% at 20% -10%, rgba(236,72,153,.25), transparent 60%),
+    linear-gradient(180deg, rgba(20,10,16,.9), rgba(5,5,5,.95));
+}
+
+*{ box-sizing:border-box }
+
+html,body{
+  margin:0;
+  height:100%;
+  background:var(--bg);
+  font-family:system-ui, sans-serif;
+  color:var(--text);
+}
+
+.hidden{ display:none !important }
+
+/* ===== hearts ===== */
+#hearts-bg{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* ===== start screen ===== */
+.start-screen{
+  position:relative;
+  z-index:2;
+  max-width:420px;
+  margin:auto;
+  padding:28px;
+  border-radius:24px;
+  background:var(--glass);
+  border:2px solid rgba(236,72,153,.4);
+  box-shadow:0 0 120px rgba(236,72,153,.25);
+  text-align:center;
+}
+
+.start-screen input{
+  width:100%;
+  padding:14px;
+  margin:14px 0;
+  border-radius:14px;
+  border:1px solid rgba(236,72,153,.3);
+  background:#000;
+  color:var(--text);
+}
+
+/* ===== layout ===== */
+.game-layout{
+  position:relative;
+  z-index:2;
+  max-width:1200px;
+  margin:auto;
+  display:flex;
+  gap:18px;
+  padding:24px;
+}
+
+/* ===== left app ===== */
+.app{
+  flex:1;
+  padding:26px;
+  border-radius:26px;
+  background:var(--glass);
+  border:2px solid rgba(236,72,153,.4);
+  box-shadow:0 0 120px rgba(236,72,153,.25);
+}
+
+/* ===== right panel ===== */
+.answered-panel{
+  width:380px;
+  padding:22px;
+  border-radius:26px;
+  background:var(--glass);
+  border:2px solid rgba(236,72,153,.4);
+  box-shadow:0 0 120px rgba(236,72,153,.25);
+  position:sticky;
+  top:24px;
+}
+
+/* ===== typography ===== */
+h1,h2{ margin:0 0 12px }
+
+.subtitle{ opacity:.8 }
+
+/* ===== question ===== */
+.card{
+  padding:24px;
+  margin:22px 0;
+  border-radius:18px;
+  background:#000;
+  border:1px solid rgba(236,72,153,.3);
+  font-size:1.2rem;
+}
 
-:root {
-  --bg-main: #000000;
-
-  --pink-1: #fbcfe8;
-  --pink-2: #f472b6;
-  --pink-3: #ec4899;
-  --pink-4: #be185d;
-
-  --card-bg: #050505;
-  --border: #2a0e1f;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  font-family: system-ui, sans-serif;
-  background: var(--bg-main);
-  color: var(--pink-1);
-  display: flex;
-  justify-content: center;
-  padding: 40px;
-  min-height: 100vh;
-  position: relative;
-}
-
-/* Make content sit above background */
-.start-screen,
-.app {
-  position: relative;
-  z-index: 2;
-}
-
-/* ================================
-   Layout
-   ================================ */
-
-.app {
-  max-width: 600px;
-  width: 100%;
-}
-
-h1 {
-  text-align: center;
-  color: var(--pink-2);
-  letter-spacing: 0.05em;
-}
-
-/* ================================
-   Meta info
-   ================================ */
-
-.meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin-top: 10px;
-  color: var(--pink-1);
-}
-
-#set, #player {
-  white-space: nowrap;
-}
-
-/* ================================
-   Question card
-   ================================ */
-
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  padding: 26px;
-  border-radius: 16px;
-  margin: 22px 0;
-  font-size: 1.25rem;
-  line-height: 1.5;
-  color: var(--pink-1);
-  box-shadow:
-    0 0 0 1px rgba(236, 72, 153, 0.08),
-    0 10px 30px rgba(236, 72, 153, 0.15);
-}
-
-/* ================================
-   Textareas (answers)
-   ================================ */
-
-textarea {
-  width: 100%;
-  height: 90px;
-  border-radius: 14px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  background: #020202;
-  color: var(--pink-1);
-  margin-bottom: 14px;
-  resize: vertical;
-  outline: none;
-}
-
-textarea:focus {
-  border-color: rgba(236, 72, 153, 0.7);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-}
-
-textarea::placeholder {
-  color: var(--pink-4);
-}
-
-.answers {
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.answer-label {
-  display: block;
-  margin: 6px 0 6px;
-  font-size: 0.85rem;
-  opacity: 0.85;
-  color: var(--pink-1);
-}
-
-#theirNote {
-  opacity: 0.85;
-  filter: brightness(0.95);
-}
-
-#theirNote[readonly] {
-  cursor: not-allowed;
-}
-
-/* ================================
-   Controls (buttons)
-   ================================ */
-
-.controls {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-}
-
-button {
-  flex: 1;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(236, 72, 153, 0.35);
-  cursor: pointer;
-
-  background: linear-gradient(180deg, rgba(236, 72, 153, 0.95), rgba(190, 24, 93, 0.95));
-  color: #ffffff;
-
-  font-weight: 700;
-  letter-spacing: 0.03em;
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    filter 0.15s ease,
-    opacity 0.15s ease;
-}
-
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 28px rgba(236, 72, 153, 0.28);
-  filter: brightness(1.05);
-}
-
-button:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.18);
-  filter: brightness(0.98);
-}
-
-button:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(236, 72, 153, 0.22),
-    0 10px 28px rgba(236, 72, 153, 0.20);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* input in controls */
-.controls input {
-  flex: 2;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: #020202;
-  color: var(--pink-1);
-  outline: none;
-  font-size: 0.95rem;
-}
-
-.controls input:focus {
-  border-color: rgba(236, 72, 153, 0.7);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-}
-
-.controls input::placeholder {
-  color: var(--pink-4);
-}
-
-/* ================================
-   Start Screen
-   ================================ */
-
-.start-screen {
-  max-width: 420px;
-  width: 100%;
-  background: #050505;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 32px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(236, 72, 153, 0.25);
-}
-
-.start-screen h1 {
-  color: var(--pink-2);
-  margin-bottom: 6px;
-}
-
-.subtitle {
-  color: var(--pink-4);
-  margin-bottom: 24px;
-}
-
-.start-screen input {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 14px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: #020202;
-  color: var(--pink-1);
-  font-size: 1rem;
-  outline: none;
-}
-
-.start-screen input:focus {
-  border-color: rgba(236, 72, 153, 0.7);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-}
-
-.start-screen input::placeholder {
-  color: var(--pink-4);
-}
-
-.start-screen button {
-  width: 100%;
-  margin-top: 10px;
-}
-
-/* ================================
-   Share info
-   ================================ */
-
-.share-info {
-  margin-top: 10px;
-  color: var(--pink-4);
-  font-size: 0.95rem;
-  line-height: 1.3;
-  min-height: 1.2em;
-}
-
-/* ================================
-   Utility
-   ================================ */
-
-.hidden { display: none; }
-
-/* Mobile friendly */
-@media (max-width: 540px) {
-  body { padding: 20px; }
-  .controls { flex-direction: column; }
-  button { width: 100%; }
-}
-
-/* ================================
-   Floating Hearts Background
-   ================================ */
-
-#hearts-bg {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* soft vignette mask */
-#hearts-bg {
-  -webkit-mask-image: radial-gradient(circle at center, transparent 0%, black 45%);
-  mask-image: radial-gradient(circle at center, transparent 0%, black 45%);
-}
-
-.heart {
-  position: absolute;
-  background-image: url("../hand-drawn-heart-1.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-
-  opacity: var(--opacity, 0.12);
-  filter:
-    brightness(1.20)
-    saturate(1.5)
-    blur(0.4px);
-
-  transform:
-    rotate(var(--rot, 0deg))
-    scale(var(--scale, 1));
-
-  will-change: transform;
-}
-
-/* ================================
-   Progress bar
-   ================================ */
-
-.progress-wrap {
-  flex: 1;
-  min-width: 160px;
-  margin: 0 6px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid rgba(236, 72, 153, 0.18);
-}
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, rgba(236, 72, 153, 0.95), rgba(190, 24, 93, 0.95));
-  border-radius: 999px;
-  transition: width 0.25s ease;
-}
-
-.progress-label {
-  margin-top: 6px;
-  font-size: 0.8rem;
-  text-align: center;
-  opacity: 0.85;
-}
-
-/* ================================
-   Answered questions table
-   ================================ */
-
-.answered-wrap {
-  margin: 10px 0 18px;
-  background: rgba(5, 5, 5, 0.55);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 10px 28px rgba(236, 72, 153, 0.10);
-}
-
-.answered-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.answered-title {
-  margin: 0;
-  font-size: 1rem;
-  color: var(--pink-2);
-  letter-spacing: 0.02em;
-}
-
-.answered-legend {
-  font-size: 0.8rem;
-  opacity: 0.85;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  margin-right: 4px;
-  border: 1px solid rgba(255,255,255,0.18);
-}
-
-.dot-a { background: rgba(236, 72, 153, 0.95); }
-.dot-b { background: rgba(251, 207, 232, 0.75); }
-
-.answered-table-wrap {
-  max-height: 220px;
-  overflow: auto;
-  border-radius: 12px;
+/* ===== answers ===== */
+textarea{
+  width:100%;
+  min-height:90px;
+  padding:14px;
+  border-radius:14px;
+  background:#000;
+  border:1px solid rgba(236,72,153,.25);
+  color:var(--text);
 }
 
-.answered-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
+.answer-label{
+  font-size:.85rem;
+  opacity:.8;
+  margin:6px 0;
+  display:block;
 }
 
-.answered-table thead th {
-  position: sticky;
-  top: 0;
-  background: #060606;
-  z-index: 1;
-  text-align: left;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--border);
-  color: var(--pink-1);
-  opacity: 0.9;
+.lock-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin:10px 0;
 }
 
-.answered-table td {
-  padding: 9px 8px;
-  border-bottom: 1px solid rgba(42, 14, 31, 0.7);
-  vertical-align: top;
+.lock-info{
+  font-size:.8rem;
+  opacity:.7;
 }
 
-.answered-table tr {
-  cursor: pointer;
+/* ===== controls ===== */
+.controls{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
 }
 
-.answered-table tr:hover {
-  background: rgba(236, 72, 153, 0.08);
+.controls input{
+  flex:1;
+  padding:12px;
+  border-radius:999px;
+  background:#000;
+  border:1px solid rgba(236,72,153,.3);
+  color:var(--text);
 }
 
-.answered-table tr.is-current {
-  background: rgba(236, 72, 153, 0.14);
+/* ===== buttons ===== */
+.btn{
+  border:none;
+  border-radius:999px;
+  padding:12px 16px;
+  cursor:pointer;
+  font-weight:700;
 }
 
-.col-small {
-  width: 52px;
-  text-align: center;
+.btn-primary{
+  background:linear-gradient(180deg,var(--pink),var(--pink-dark));
+  color:#fff;
 }
 
-.badge {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.18);
-  opacity: 0.35; /* unanswered */
+.btn-secondary{
+  background:#111;
+  color:var(--text);
+  border:1px solid rgba(236,72,153,.3);
 }
 
-.badge.on { opacity: 1; }
-
-.badge.a { background: rgba(236, 72, 153, 0.95); }
-.badge.b { background: rgba(251, 207, 232, 0.75); }
-
-.qtext {
-  opacity: 0.9;
-  line-height: 1.25;
-}
-
-@media (max-width: 540px) {
-  .answered-table-wrap { max-height: 260px; }
-  .answered-legend { display: none; }
-}
-
-/* ================================
-   Phase 1: Lock + Reveal
-   ================================ */
-
-.lock-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: -4px 0 14px;
-}
-
-.lock-info {
-  flex: 1;
-  font-size: 0.85rem;
-  color: var(--pink-4);
-  opacity: 0.95;
-  text-align: left;
-}
-
-textarea.is-locked {
-  opacity: 0.75;
-  filter: brightness(0.9);
-}
-
-/* Answered table: draft vs locked */
-.badge.draft { opacity: 0.75; }
-
-/* ================================
-   Phase 2A (1): Reveal moment animation
-   ================================ */
-
-.reveal-pop {
-  animation: revealPop 0.55s ease;
-  box-shadow: 0 0 0 3px rgba(236,72,153,0.20), 0 12px 30px rgba(236,72,153,0.18);
-}
-
-@keyframes revealPop {
-  0% { transform: translateY(2px); filter: brightness(0.9); }
-  60% { transform: translateY(0); filter: brightness(1.15); }
-  100% { transform: translateY(0); filter: brightness(1.0); }
-}
-
-/* ================================
-   Modern Controls / Toolbars (Phase 2 UX)
-   Drop-in override: paste at END of style.css
-   ================================ */
-
-/* Slightly better overall rhythm */
-.app {
-  gap: 14px;
-}
-
-/* Controls rows become "toolbars" */
-.controls {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: 18px;
-  background: rgba(8, 8, 8, 0.55);
-  border: 1px solid rgba(236, 72, 153, 0.14);
-  box-shadow:
-    0 0 0 1px rgba(236, 72, 153, 0.06),
-    0 18px 50px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
-}
-
-/* Make the "import" row 2 columns (input bigger) */
-.controls:has(input) {
-  grid-template-columns: 2.2fr 1fr;
-}
-
-/* Make share/copy row 2 columns (nicer) */
-.controls:has(#share):has(#copyLink) {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-/* Buttons: modern pill */
-.controls button,
-button.btn {
-  appearance: none;
-  border: 0;
-  border-radius: 999px;
-  padding: 12px 14px;
-  min-height: 46px;
-
-  font-weight: 750;
-  letter-spacing: 0.02em;
-
-  color: rgba(255, 255, 255, 0.92);
-  background:
-    radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,0.16), rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(236, 72, 153, 0.92), rgba(190, 24, 93, 0.92));
-
-  box-shadow:
-    0 10px 26px rgba(236, 72, 153, 0.18),
-    0 0 0 1px rgba(236, 72, 153, 0.22),
-    inset 0 1px 0 rgba(255,255,255,0.14);
-
-  cursor: pointer;
-  transition:
-    transform 0.14s ease,
-    filter 0.14s ease,
-    box-shadow 0.14s ease,
-    opacity 0.14s ease;
-}
-
-.controls button:hover,
-button.btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.06);
-  box-shadow:
-    0 14px 34px rgba(236, 72, 153, 0.22),
-    0 0 0 1px rgba(236, 72, 153, 0.26),
-    inset 0 1px 0 rgba(255,255,255,0.16);
-}
-
-.controls button:active,
-button.btn:active {
-  transform: translateY(0);
-  filter: brightness(0.98);
-  box-shadow:
-    0 9px 22px rgba(236, 72, 153, 0.16),
-    0 0 0 1px rgba(236, 72, 153, 0.20),
-    inset 0 1px 0 rgba(0,0,0,0.08);
-}
-
-.controls button:focus-visible,
-button.btn:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(236, 72, 153, 0.18),
-    0 0 0 1px rgba(236, 72, 153, 0.26),
-    0 16px 36px rgba(236, 72, 153, 0.20);
-}
-
-/* Secondary / ghost styles using your existing classes */
-.btn.btn-secondary,
-.controls .btn-secondary {
-  background:
-    radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,0.12), rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(30, 30, 30, 0.85), rgba(10, 10, 10, 0.85));
-  color: rgba(251, 207, 232, 0.95);
-  box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(236, 72, 153, 0.16),
-    inset 0 1px 0 rgba(255,255,255,0.10);
-}
-
-.btn.btn-ghost,
-.controls .btn-ghost {
-  background: rgba(255,255,255,0.04);
-  color: rgba(251, 207, 232, 0.9);
-  box-shadow:
-    0 0 0 1px rgba(236, 72, 153, 0.12),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-}
-
-/* Disabled */
-.controls button:disabled,
-button.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  filter: none;
-  box-shadow:
-    0 0 0 1px rgba(236, 72, 153, 0.12),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-}
-
-/* Input inside controls: modern "field" */
-.controls input {
-  width: 100%;
-  min-height: 46px;
-  border-radius: 999px;
-  padding: 12px 16px;
-
-  border: 1px solid rgba(236, 72, 153, 0.16);
-  background:
-    radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%),
-    rgba(0,0,0,0.55);
-
-  color: rgba(251, 207, 232, 0.95);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.06),
-    0 12px 30px rgba(0,0,0,0.55);
-}
-
-.controls input:focus {
-  outline: none;
-  border-color: rgba(236, 72, 153, 0.35);
-  box-shadow:
-    0 0 0 3px rgba(236, 72, 153, 0.16),
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    0 12px 30px rgba(0,0,0,0.55);
-}
-
-.controls input::placeholder {
-  color: rgba(190, 24, 93, 0.95);
-  opacity: 0.75;
-}
-
-/* Mobile: stack nicely */
-@media (max-width: 540px) {
-  .controls {
-    grid-template-columns: 1fr;
-    padding: 10px;
-  }
-
-  .controls:has(input) {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ================================
-   Big Foreground Panel (Glass Segment)
-   Paste at END of style.css
-   ================================ */
-
-/* Center page nicely + keep hearts behind */
-body {
-  align-items: center;              /* vertical center feel */
-  padding: 36px 18px;               /* nicer edges on mobile */
-}
-
-/* One big panel for the whole app */
-.app,
-.start-screen {
-  width: min(760px, 100%);
-  padding: 26px;
-  border-radius: 26px;
-
-  /* glass background */
-  background:
-    radial-gradient(120% 120% at 20% 0%, rgba(236,72,153,0.10), rgba(0,0,0,0) 52%),
-    rgba(5, 5, 5, 0.58);
-
-  border: 1px solid rgba(236, 72, 153, 0.16);
-
-  box-shadow:
-    0 0 0 1px rgba(236, 72, 153, 0.05),
-    0 28px 90px rgba(0, 0, 0, 0.72);
-
-  backdrop-filter: blur(14px);
-}
-
-/* Optional: inner glow edge (looks premium) */
-.app::before,
-.start-screen::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.06),
-    inset 0 0 0 1px rgba(236,72,153,0.06);
-  opacity: 0.9;
-}
-
-/* Ensure pseudo-element works (positioning) */
-.app,
-.start-screen {
-  position: relative;
-}
-
-/* Pull content above ::before */
-.app > *,
-.start-screen > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Slightly tighten typography inside the big panel */
-.app h1,
-.start-screen h1 {
-  margin-top: 4px;
-}
-
-.meta {
-  margin-top: 14px;
-}
-
-/* Now that we have a big panel, reduce extra “panel” look of controls rows */
-.controls {
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(236,72,153,0.10);
-  box-shadow:
-    0 0 0 1px rgba(236,72,153,0.04),
-    0 14px 40px rgba(0,0,0,0.55);
-}
-
-/* Make answered section blend into the big panel */
-.answered-wrap {
-  background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(236,72,153,0.12);
-}
-
-/* Card a textareas can be a bit lighter now */
-.card {
-  background: rgba(0,0,0,0.45);
-  border: 1px solid rgba(236,72,153,0.14);
-}
-
-textarea {
-  background: rgba(0,0,0,0.40);
-  border: 1px solid rgba(236,72,153,0.14);
-}
-
-/* Mobile: keep it comfy */
-@media (max-width: 540px) {
-  .app,
-  .start-screen {
-    padding: 18px;
-    border-radius: 22px;
-  }
+.btn-ghost{
+  background:transparent;
+  color:var(--text);
+  border:1px dashed rgba(236,72,153,.3);
 }
 
-/* ================================
-   Rose / Pink Glass Tint (Foreground)
-   Paste at END of style.css
-   ================================ */
-
-/* Main glass container tint */
-.app,
-.start-screen {
-  background:
-    /* top pink glow */
-    radial-gradient(
-      120% 80% at 20% -10%,
-      rgba(236, 72, 153, 0.18),
-      rgba(236, 72, 153, 0.06) 38%,
-      rgba(0, 0, 0, 0) 60%
-    ),
-
-    /* bottom red warmth */
-    radial-gradient(
-      140% 100% at 80% 110%,
-      rgba(190, 24, 93, 0.16),
-      rgba(190, 24, 93, 0.05) 40%,
-      rgba(0, 0, 0, 0) 65%
-    ),
-
-    /* base glass */
-    linear-gradient(
-      180deg,
-      rgba(12, 6, 10, 0.78),
-      rgba(5, 5, 5, 0.88)
-    );
-
-  border: 1px solid rgba(236, 72, 153, 0.22);
-
-  box-shadow:
-    /* outer glow */
-    0 0 0 1px rgba(236, 72, 153, 0.08),
-    0 30px 100px rgba(0, 0, 0, 0.75),
-
-    /* subtle pink ambient glow */
-    0 0 120px rgba(236, 72, 153, 0.12);
-
-  backdrop-filter: blur(16px) saturate(1.15);
-}
-
-/* Inner glass highlight (premium feel) */
-.app::before,
-.start-screen::before {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    inset 0 0 0 1px rgba(236,72,153,0.10),
-    inset 0 -20px 40px rgba(236,72,153,0.04);
-}
-
-/* Slight pink reflection on cards */
-.card {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(236,72,153,0.04),
-      rgba(0,0,0,0.45)
-    ),
-    rgba(0,0,0,0.45);
-
-  box-shadow:
-    0 0 0 1px rgba(236,72,153,0.10),
-    0 16px 40px rgba(0,0,0,0.55);
-}
-
-/* Textareas inherit glass tint */
-textarea {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(236,72,153,0.03),
-      rgba(0,0,0,0.40)
-    ),
-    rgba(0,0,0,0.40);
-
-  border: 1px solid rgba(236,72,153,0.18);
+/* ===== progress ===== */
+.progress-bar{
+  height:10px;
+  background:#222;
+  border-radius:999px;
+  overflow:hidden;
 }
 
-/* Answered section blends with rose glass */
-.answered-wrap {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(236,72,153,0.035),
-      rgba(0,0,0,0.30)
-    ),
-    rgba(0,0,0,0.30);
-
-  border: 1px solid rgba(236,72,153,0.14);
+.progress-fill{
+  height:100%;
+  width:0%;
+  background:var(--pink);
 }
-
-/* ================================
-   Stronger Rose Glass – Thicker Frame
-   Paste at END of style.css
-   ================================ */
-
-.app,
-.start-screen {
-  /* thicker, clearer border */
-  border: 2px solid rgba(236, 72, 153, 0.42);
-
-  /* stronger rose / wine tint */
-  background:
-    /* top rose highlight */
-    radial-gradient(
-      120% 85% at 18% -12%,
-      rgba(236, 72, 153, 0.32),
-      rgba(236, 72, 153, 0.12) 38%,
-      rgba(0, 0, 0, 0) 62%
-    ),
-
-    /* bottom wine warmth */
-    radial-gradient(
-      140% 110% at 82% 115%,
-      rgba(190, 24, 93, 0.30),
-      rgba(190, 24, 93, 0.10) 42%,
-      rgba(0, 0, 0, 0) 70%
-    ),
-
-    /* base glass */
-    linear-gradient(
-      180deg,
-      rgba(18, 8, 14, 0.82),
-      rgba(6, 6, 6, 0.92)
-    );
 
-  box-shadow:
-    /* crisp edge */
-    0 0 0 1px rgba(236, 72, 153, 0.35),
-
-    /* depth */
-    0 32px 110px rgba(0, 0, 0, 0.80),
-
-    /* ambient rose glow */
-    0 0 140px rgba(236, 72, 153, 0.28);
-
-  backdrop-filter: blur(18px) saturate(1.25);
+.progress-label{
+  font-size:.75rem;
+  opacity:.7;
+  text-align:center;
+  margin-top:4px;
 }
 
-/* Inner edge highlight – makes border feel "thick" */
-.app::before,
-.start-screen::before {
-  box-shadow:
-    inset 0 0 0 1px rgba(236, 72, 153, 0.22),
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    inset 0 -28px 60px rgba(236,72,153,0.10);
+/* ===== answered table ===== */
+.answered-table-wrap{
+  max-height:520px;
+  overflow:auto;
 }
-
-/* Cards pop a bit more from glass */
-.card {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(236,72,153,0.08),
-      rgba(0,0,0,0.48)
-    ),
-    rgba(0,0,0,0.48);
 
-  border: 1px solid rgba(236,72,153,0.28);
-
-  box-shadow:
-    0 0 0 1px rgba(236,72,153,0.18),
-    0 18px 46px rgba(0,0,0,0.60);
+.answered-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.85rem;
 }
-
-/* Textareas: slightly stronger pink edge */
-textarea {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(236,72,153,0.06),
-      rgba(0,0,0,0.45)
-    ),
-    rgba(0,0,0,0.45);
 
-  border: 1px solid rgba(236,72,153,0.30);
+.answered-table th,
+.answered-table td{
+  padding:8px;
+  border-bottom:1px solid rgba(236,72,153,.2);
 }
 
-textarea:focus {
-  border-color: rgba(236,72,153,0.55);
-  box-shadow:
-    0 0 0 3px rgba(236,72,153,0.22),
-    0 14px 40px rgba(0,0,0,0.65);
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  display:inline-block;
 }
 
-/* Answered table blends but stays defined */
-.answered-wrap {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(236,72,153,0.06),
-      rgba(0,0,0,0.34)
-    ),
-    rgba(0,0,0,0.34);
-
-  border: 1px solid rgba(236,72,153,0.24);
-}
+.dot-a{ background:var(--pink) }
+.dot-b{ background:var(--text) }
 
-/* Controls panel edge stronger */
-.controls {
-  border: 1px solid rgba(236,72,153,0.28);
-  box-shadow:
-    0 0 0 1px rgba(236,72,153,0.14),
-    0 16px 48px rgba(0,0,0,0.60);
+/* ===== responsive ===== */
+@media(max-width:900px){
+  .game-layout{ flex-direction:column }
+  .answered-panel{ width:100%; position:static }
 }

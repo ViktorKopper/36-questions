@@ -38,8 +38,6 @@
   const finishBtn = qs("finishBtn");
   const earlyFinishBtn = qs("earlyFinishBtn");
 
-
-
   const shareBtn = qs("share");
   const copyBtn = qs("copyLink");
   const shareInfo = qs("shareInfo");
@@ -69,12 +67,15 @@
   const howMergeBackdrop = qs("howMergeBackdrop");
   const howMergeClose = qs("howMergeClose");
 
+  // Role screen
   const roleScreen = qs("role-screen");
   const roleCards = document.querySelectorAll(".role-card");
   const roleContinue = qs("roleContinue");
 
-
-
+  // Player B join
+  const roleJoin = qs("roleJoin");
+  const roleSessionLink = qs("roleSessionLink");
+  const roleJoinError = qs("roleJoinError");
 
   // State
   const state = window.Store.load();
@@ -89,21 +90,14 @@
     window.EndGame.bind(() => state);
   }
 
-
   // runtime-only memory to animate reveal once per question
   const revealedMemory = {}; // qid -> boolean (not stored)
 
   function ensureViewer() {
-    /*if (viewer === "A" || viewer === "B") return viewer;
-
-    const isA = confirm("Assign this device:\n\nOK = Player A\nCancel = Player B");
-    viewer = isA ? "A" : "B";
-    window.Store.setViewer(viewer);*/
     return viewer;
   }
 
   function isViewerA() {
-    // viewer je "A" / "B" (device assignment)
     return ensureViewer() === "A";
   }
 
@@ -125,6 +119,26 @@
   function setShareMessage(text, url) {
     shareInfo.textContent = text;
     if (url) shareInfo.dataset.link = url;
+  }
+
+  // Role join helpers
+  function setRoleJoinError(msg) {
+    if (!roleJoinError) return;
+    if (!msg) {
+      roleJoinError.classList.add("hidden");
+      roleJoinError.textContent = "";
+      return;
+    }
+    roleJoinError.classList.remove("hidden");
+    roleJoinError.textContent = msg;
+  }
+
+  function validateSessionLink(url) {
+    const u = String(url || "").trim();
+    if (!u) return { ok: false, reason: "Paste the session link from Player A." };
+    const payload = window.Session.decodePayloadFromUrl(u);
+    if (!payload) return { ok: false, reason: "Invalid link. Paste the full link containing #s=..." };
+    return { ok: true, payload };
   }
 
   // Merge UI helpers
@@ -163,7 +177,6 @@
     }
   }
 
-
   function openConflictModal(html) {
     if (!conflictModal || !conflictModalBody) return;
     conflictModalBody.innerHTML = html;
@@ -180,7 +193,6 @@
 
   conflictModalBackdrop?.addEventListener("click", closeConflictModal);
   conflictModalClose?.addEventListener("click", closeConflictModal);
-
 
   // Order of questions
   function ensureOrder() {
@@ -346,7 +358,6 @@
     };
   }
 
-
   function toggleTurn() {
     state.player = state.player === "A" ? "B" : "A";
   }
@@ -444,7 +455,6 @@
     ensureOrder();
     return state.order.every((qid) => bothLocked(qid));
   }
-
 
   function isAnswered(text) {
     return typeof text === "string" && text.trim().length > 0;
@@ -583,6 +593,7 @@
     renderAnsweredTable();
     renderMergeReport(state.mergeReport);
     syncDeviceRoleUi();
+
     if (finishBtn) finishBtn.classList.toggle("hidden", !isCompleteGame());
     if (earlyFinishBtn) earlyFinishBtn.classList.toggle("hidden", !isViewerA());
 
@@ -613,7 +624,13 @@
   deviceRoleA?.addEventListener("click", () => {
     setViewer("A");
     syncDeviceRoleUi();
-    render(); // refresh UI immediately (reveals early button)
+    render();
+  });
+
+  deviceRoleB?.addEventListener("click", () => {
+    setViewer("B");
+    syncDeviceRoleUi();
+    render();
   });
 
   function openHowTo() {
@@ -643,14 +660,6 @@
   howMergeBtn?.addEventListener("click", openHowMerge);
   howMergeBackdrop?.addEventListener("click", closeHowMerge);
   howMergeClose?.addEventListener("click", closeHowMerge);
-
-
-
-  deviceRoleB?.addEventListener("click", () => {
-    setViewer("B");
-    syncDeviceRoleUi();
-    render();
-  });
 
   myNote.addEventListener("input", () => {
     ensureOrder();
@@ -725,13 +734,11 @@
     }
     if (!window.EndGame) return;
 
-    // Optional confirmation, lebo je to “predčasne”
     const ok = confirm("Open Conclusion early?\n\nUnfinished / unlocked answers may stay hidden.");
     if (!ok) return;
 
     window.EndGame.open(state);
   });
-
 
   resetBtn.addEventListener("click", () => {
     const ok = confirm("Reset the whole game? This will delete all progress and answers.");
@@ -776,42 +783,105 @@
     state.mergeReport = report;
     save();
 
-    // Update UI (no reload needed)
     render();
     renderMergeReport(report);
 
-    // Optional: clear hash so you don't accidentally re-merge on refresh
     history.replaceState(null, "", location.pathname + location.search);
   });
 
-
-  // Init
+  // =========================================================
+  // ROLE SELECTION INIT (Player B can paste session link here)
+  // =========================================================
   let selectedRole = null;
 
-  roleCards.forEach(card => {
+  function updateRoleUiAfterSelect() {
+    if (!roleJoin || !roleContinue) return;
+
+    // show join section only for B
+    roleJoin.classList.toggle("hidden", selectedRole !== "B");
+    setRoleJoinError("");
+
+    if (selectedRole === "A") {
+      roleContinue.disabled = false;
+      return;
+    }
+
+    // selectedRole === "B" -> require valid link
+    const r = validateSessionLink(roleSessionLink?.value);
+    roleContinue.disabled = !r.ok;
+
+    // only show error if user typed something
+    if (roleSessionLink?.value && !r.ok) setRoleJoinError(r.reason);
+  }
+
+  roleCards.forEach((card) => {
     card.addEventListener("click", () => {
-      roleCards.forEach(c => c.classList.remove("selected"));
+      roleCards.forEach((c) => c.classList.remove("selected"));
       card.classList.add("selected");
       selectedRole = card.dataset.role;
-      roleContinue.disabled = false;
+
+      // default: disabled, then update based on role
+      roleContinue.disabled = true;
+      updateRoleUiAfterSelect();
     });
   });
 
-  roleContinue.addEventListener("click", () => {
+  roleSessionLink?.addEventListener("input", () => {
+    if (selectedRole !== "B") return;
+    const r = validateSessionLink(roleSessionLink.value);
+    roleContinue.disabled = !r.ok;
+    setRoleJoinError(r.ok ? "" : r.reason);
+  });
+
+  roleContinue?.addEventListener("click", () => {
     if (!selectedRole) return;
+
+    // persist viewer
     viewer = selectedRole;
     window.Store.setViewer(viewer);
 
+    // Player B: must paste link & merge immediately
+    if (selectedRole === "B") {
+      const r = validateSessionLink(roleSessionLink?.value);
+      if (!r.ok) {
+        setRoleJoinError(r.reason);
+        return;
+      }
+
+      if (!window.Session.mergeIntoState) {
+        setRoleJoinError("Merge function missing. session.js not updated?");
+        return;
+      }
+
+      const report = window.Session.mergeIntoState(state, r.payload);
+      state.mergeReport = report;
+      save();
+
+      // clean URL
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+
+    // hide role screen
     roleScreen.classList.add("hidden");
-    showStartScreen(); // existing start screen (names)
+
+    // if session already has players + order -> go straight to game
+    if (state.players?.A && state.players?.B && Array.isArray(state.order) && state.order.length) {
+      showGameScreen();
+      render();
+      return;
+    }
+
+    showStartScreen();
   });
 
+  // Init routing
   viewer = window.Store.getViewer();
 
   if (!viewer) {
     roleScreen.classList.remove("hidden");
     startScreen.classList.add("hidden");
     appScreen.classList.add("hidden");
+    updateRoleUiAfterSelect(); // keeps Continue disabled until select
   } else if (state.players?.A && state.players?.B) {
     showGameScreen();
     render();

@@ -704,3 +704,47 @@ textarea[readonly]{
   .role-shell{ padding: 26px 16px; }
   .role-card{ width: 100%; max-width: 340px; }
 }
+
+/* Role join (Player B) */
+.role-join{
+  margin: 14px auto 0;
+  padding: 14px;
+  border-radius: 18px;
+
+  background: rgba(0,0,0,0.24);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+  max-width: 680px;
+  text-align: left;
+}
+
+.role-join-title{
+  font-weight: 850;
+  color: rgba(252,231,243,0.96);
+  margin-bottom: 4px;
+}
+
+.role-join-sub{
+  font-size: 0.92rem;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.role-join input{
+  width: 100%;
+  border-radius: 999px;
+  padding: 12px 14px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(236,72,153,0.20);
+  color: rgba(252,231,243,0.95);
+}
+
+.role-join-error{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(190,24,93,0.18);
+  border: 1px solid rgba(236,72,153,0.30);
+  color: rgba(252,231,243,0.95);
+  font-size: 0.92rem;
+}

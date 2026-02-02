@@ -403,6 +403,8 @@ textarea[readonly]{
 
 .col-small{ width: 52px; text-align:center; }
 
+/* ===== Answered table badges ===== */
+
 .badge{
   display:inline-block;
   width:10px;
@@ -410,13 +412,30 @@ textarea[readonly]{
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.18);
   opacity: 0.35;
+  background: rgba(255,255,255,0.15); /* default = unanswered */
 }
 
-.badge.on{ opacity:1; }
-.badge.draft{ opacity:0.75; }
+/* draft = answer written but not locked */
+.badge.draft{
+  opacity: 0.7;
+  background: rgba(148,163,184,0.6); /* slate/grey */
+}
 
-.badge.a{ background: rgba(236, 72, 153, 0.95); }
-.badge.b{ background: rgba(251, 207, 232, 0.75); }
+/* LOCKED = ANSWERED → GREEN */
+.badge.on{
+  opacity: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(34,197,94,0.95),
+    rgba(16,185,129,0.95)
+  );
+  border-color: rgba(34,197,94,0.6);
+  box-shadow: 0 0 6px rgba(34,197,94,0.6);
+}
+
+/* keep A/B logic only semantic (no color difference) */
+.badge.a{}
+.badge.b{}
 
 .qtext{ opacity: 0.92; line-height: 1.25; }
 
